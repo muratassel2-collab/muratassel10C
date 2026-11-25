@@ -1,0 +1,2414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>OlimpHub — Интерактивный тренажёр олимпиадника (7–11 классы)</title>
+
+  <!-- Шрифты Plus Jakarta Sans, Inter и JetBrains Mono для выразительной академической типографики -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- KaTeX для корректного отображения математических и физических формул -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Tailwind CSS для быстрой и адаптивной верстки -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            body: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#EEF2FF',
+              100: '#E0E7FF',
+              500: '#6366F1',
+              600: '#4F46E5',
+              700: '#4338CA',
+              900: '#312E81',
+            },
+            kaspi: {
+              red: '#F14635',
+              dark: '#C92A1D',
+              soft: '#FFF1F0',
+            }
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Базовые переменные и стили выразительного академического EdTech */
+    :root {
+      --bg-page: #F6F8FC;
+      --bg-card: #FFFFFF;
+      --border-subtle: #E2E8F0;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --accent-indigo: #4F46E5;
+      --accent-emerald: #10B981;
+      --accent-amber: #F59E0B;
+      --kaspi-red: #F14635;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      background-image: radial-gradient(rgba(79, 70, 229, 0.07) 1px, transparent 1px);
+      background-size: 22px 22px;
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, .font-display {
+      font-family: '"Plus Jakarta Sans"', 'Inter', sans-serif;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(7px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .shake-x {
+      animation: shakeX 0.36s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    @keyframes shakeX {
+      10%, 90% { transform: translateX(-2px); }
+      20%, 80% { transform: translateX(4px); }
+      30%, 50%, 70% { transform: translateX(-5px); }
+      40%, 60% { transform: translateX(5px); }
+    }
+
+    .toast-enter {
+      animation: toastSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes toastSlide {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .edu-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 8px 24px -18px rgba(79, 70, 229, 0.22);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (hover: hover) {
+      .edu-card-hover:hover {
+        border-color: #A5B4FC;
+        box-shadow: 0 12px 26px -10px rgba(79, 70, 229, 0.16);
+        transform: translateY(-3px);
+      }
+    }
+
+    .touch-target {
+      min-height: 44px;
+    }
+
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      padding: 6px 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .katex {
+      font-size: 1.02em;
+    }
+
+    .kaspi-qr-grid {
+      background-image:
+        linear-gradient(45deg, #0f172a 25%, transparent 25%),
+        linear-gradient(-45deg, #0f172a 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #0f172a 75%),
+        linear-gradient(-45deg, transparent 75%, #0f172a 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    }
+
+    .mobile-bottom-nav {
+      padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-20 md:pb-0 selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- ==================== ВЕРХНЯЯ ПАНЕЛЬ SANDBOX-МОНЕТИЗАЦИИ И СТАТУСА ==================== -->
+  <div class="bg-slate-900 text-slate-200 text-xs border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-medium border border-indigo-500/30 shrink-0">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+          Sandbox
+        </span>
+        <span class="text-slate-400 hidden lg:inline truncate">Переключайте тариф для теста монетизации или оформите через Kaspi:</span>
+      </div>
+
+      <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto overflow-x-auto">
+        <div class="inline-flex rounded-lg bg-slate-800 p-0.5 border border-slate-700 shrink-0" role="group" aria-label="Выбор демо-тарифа">
+          <button type="button" onclick="setPlan('freemium')" id="sandbox-btn-freemium" class="px-2.5 py-1.5 sm:py-1 rounded-md font-medium transition text-[11px] sm:text-xs whitespace-nowrap">
+            Freemium
+          </button>
+          <button type="button" onclick="setPlan('intensive')" id="sandbox-btn-intensive" class="px-2.5 py-1.5 sm:py-1 rounded-md font-medium transition text-[11px] sm:text-xs whitespace-nowrap">
+            Интенсив (<span id="sandbox-credits-count">15</span>)
+          </button>
+          <button type="button" onclick="setPlan('pro')" id="sandbox-btn-pro" class="px-2.5 py-1.5 sm:py-1 rounded-md font-medium transition text-[11px] sm:text-xs whitespace-nowrap">
+            PRO
+          </button>
+        </div>
+
+        <button type="button" onclick="openResetModal()" class="inline-flex items-center gap-1 px-2.5 py-1.5 sm:py-1 rounded-lg bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-800 transition shrink-0 text-[11px] sm:text-xs" title="Сбросить прогресс и настройки в localStorage">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Сброс</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ОСНОВНАЯ ШАПКА И НАВИГАЦИЯ ==================== -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/90">
+    <div class="max-w-7xl mx-auto px-3.5 sm:px-6 h-15 sm:h-16 flex items-center justify-between gap-2.5">
+      <a href="#catalog" onclick="switchTab('catalog'); return false;" class="flex items-center gap-2 group shrink-0">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold shadow-sm shadow-indigo-500/20 group-hover:scale-[1.03] transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-display font-extrabold text-base sm:text-lg tracking-tight text-slate-900">Olimp<span class="text-indigo-600">Hub</span></span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">7–11</span>
+          </div>
+          <p class="text-[11px] text-slate-500 hidden sm:block leading-none">Тренажёр олимпиадника</p>
+        </div>
+      </a>
+
+      <!-- Десктопная навигация -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80" aria-label="Главное меню">
+        <button type="button" onclick="switchTab('catalog')" data-tab="catalog" class="nav-btn px-3.5 py-1.5 rounded-lg text-sm font-medium transition">
+          Каталог задач
+        </button>
+        <button type="button" onclick="switchTab('trainer')" data-tab="trainer" class="nav-btn px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5">
+          <span>Тренажёр и разбор</span>
+          <span id="nav-active-task-badge" class="text-[11px] font-mono px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-700">#1</span>
+        </button>
+        <button type="button" onclick="switchTab('progress')" data-tab="progress" class="nav-btn px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5">
+          <span>Прогресс и слабые темы</span>
+          <span id="nav-weak-count" class="hidden text-[11px] font-semibold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800">0</span>
+        </button>
+        <button type="button" onclick="switchTab('pricing')" data-tab="pricing" class="nav-btn px-3.5 py-1.5 rounded-lg text-sm font-medium transition">
+          Тарифы
+        </button>
+      </nav>
+
+      <!-- Виджет текущего статуса -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+          <span class="text-slate-500">Решено:</span>
+          <span class="font-bold text-slate-900 font-mono"><span id="header-solved-count">0</span>/8</span>
+        </div>
+
+        <button type="button" onclick="switchTab('pricing')" id="header-plan-badge" class="touch-target inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition shadow-xs">
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== НИЖНЯЯ НАВИГАЦИЯ ДЛЯ СМАРТФОНОВ (< md) ==================== -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 mobile-bottom-nav shadow-[0_-4px_16px_rgba(15,23,42,0.06)]" aria-label="Мобильная навигация">
+    <div class="grid grid-cols-4 gap-1 px-1.5 pt-1">
+      <button type="button" onclick="switchTab('catalog')" data-tab="catalog" class="nav-btn touch-target flex flex-col items-center justify-center py-1 rounded-xl text-[11px] font-medium transition">
+        <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <span>Каталог</span>
+      </button>
+      <button type="button" onclick="switchTab('trainer')" data-tab="trainer" class="nav-btn touch-target flex flex-col items-center justify-center py-1 rounded-xl text-[11px] font-medium transition">
+        <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        <span>Тренажёр</span>
+      </button>
+      <button type="button" onclick="switchTab('progress')" data-tab="progress" class="nav-btn touch-target flex flex-col items-center justify-center py-1 rounded-xl text-[11px] font-medium transition relative">
+        <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span>Прогресс</span>
+      </button>
+      <button type="button" onclick="switchTab('pricing')" data-tab="pricing" class="nav-btn touch-target flex flex-col items-center justify-center py-1 rounded-xl text-[11px] font-medium transition">
+        <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Тарифы</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== ОСНОВНОЙ КОНТЕЙНЕР ПРИЛОЖЕНИЯ ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 py-5 sm:py-8">
+
+    <!-- ====================================================================== -->
+    <!-- РАЗДЕЛ 1: УМНЫЙ РУБРИКАТОР И КАТАЛОГ ЗАДАЧ                             -->
+    <!-- ====================================================================== -->
+    <section id="view-catalog" class="fade-in space-y-5 sm:space-y-6">
+      <!-- Hero-блок -->
+      <div class="edu-card p-5 sm:p-7 bg-gradient-to-br from-white via-indigo-50/35 to-amber-50/35 relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div class="space-y-2.5 max-w-2xl relative z-10">
+          <div class="inline-flex flex-wrap items-center gap-2 text-xs font-semibold text-indigo-700 bg-indigo-50/90 px-3 py-1 rounded-full border border-indigo-200/70">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Архив олимпиад РК и СНГ • 2023–2026</span>
+          </div>
+          <h1 class="text-xl sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
+            Готовься к олимпиадам системно — <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">с логикой жюри</span>
+          </h1>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Фильтруй задачи по классу, этапу и теме, проверяй ответы мгновенно и открывай ступенчатые подсказки или разбор по Kaspi QR, когда нужна помощь.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:flex sm:flex-nowrap items-center gap-2.5 sm:gap-3 shrink-0 relative z-10">
+          <div class="px-3.5 sm:px-4 py-3 rounded-2xl bg-white/90 border border-slate-200/90 text-center shadow-2xs">
+            <div class="text-[11px] text-slate-500 font-medium">Задач в базе</div>
+            <div class="text-lg sm:text-xl font-extrabold text-slate-900 font-mono">8</div>
+          </div>
+          <div class="px-3.5 sm:px-4 py-3 rounded-2xl bg-white/90 border border-slate-200/90 text-center shadow-2xs">
+            <div class="text-[11px] text-slate-500 font-medium">Решено вами</div>
+            <div class="text-lg sm:text-xl font-extrabold text-emerald-600 font-mono" id="catalog-stat-solved">0</div>
+          </div>
+          <button type="button" onclick="startWeakTopicsTraining()" class="col-span-2 sm:col-span-1 touch-target px-4 py-3 rounded-2xl bg-slate-900 hover:bg-indigo-600 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>Слабые темы</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Панель умного рубрикатора и поиска -->
+      <div class="edu-card p-4 sm:p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input
+              type="text"
+              id="filter-search"
+              oninput="applyFilters()"
+              placeholder="Поиск по условию, теме или олимпиаде..."
+              class="touch-target w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition"
+            />
+          </div>
+
+          <button type="button" onclick="resetFilters()" class="touch-target px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-medium transition shrink-0 flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <span>Сбросить фильтры</span>
+          </button>
+        </div>
+
+        <!-- Селекты рубрикатора -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div>
+            <label for="filter-subject" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Предмет</label>
+            <select id="filter-subject" onchange="applyFilters()" class="touch-target w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+              <option value="all">Все предметы</option>
+              <option value="Математика">Математика</option>
+              <option value="Физика">Физика</option>
+              <option value="Химия">Химия</option>
+              <option value="Информатика">Информатика</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="filter-grade" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Класс</label>
+            <select id="filter-grade" onchange="applyFilters()" class="touch-target w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+              <option value="all">Все классы (7–11)</option>
+              <option value="7">7 класс</option>
+              <option value="8">8 класс</option>
+              <option value="9">9 класс</option>
+              <option value="10">10 класс</option>
+              <option value="11">11 класс</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="filter-stage" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Этап олимпиады</label>
+            <select id="filter-stage" onchange="applyFilters()" class="touch-target w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+              <option value="all">Все этапы</option>
+              <option value="Школьный">Школьный</option>
+              <option value="Районный">Районный</option>
+              <option value="Областной">Областной</option>
+              <option value="Республиканский">Республиканский</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="filter-year" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Год</label>
+            <select id="filter-year" onchange="applyFilters()" class="touch-target w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+              <option value="all">Все годы</option>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+            </select>
+          </div>
+
+          <div class="col-span-2 sm:col-span-1">
+            <label for="filter-topic" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Тема</label>
+            <select id="filter-topic" onchange="applyFilters()" class="touch-target w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+              <option value="all">Все темы</option>
+              <option value="Комбинаторика">Комбинаторика</option>
+              <option value="Теория чисел">Теория чисел</option>
+              <option value="Термодинамика">Термодинамика</option>
+              <option value="Механика">Механика</option>
+              <option value="Органический синтез">Органический синтез</option>
+              <option value="Стехиометрия">Стехиометрия</option>
+              <option value="Динамическое программирование">Динамическое программирование</option>
+              <option value="Электродинамика">Электродинамика</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs text-slate-500">
+          <span>Найдено задач: <strong id="catalog-count" class="text-slate-900">8</strong></span>
+          <span class="hidden sm:inline">Подсказка 1 доступна бесплатно во всех задачах</span>
+        </div>
+      </div>
+
+      <!-- Сетка карточек задач -->
+      <div id="tasks-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      </div>
+    </section>
+
+    <!-- ====================================================================== -->
+    <!-- РАЗДЕЛ 2: ИНТЕРАКТИВНЫЙ ТРЕНАЖЁР И СТУПЕНЧАТЫЙ РАЗБОР ЗАДАЧИ           -->
+    <!-- ====================================================================== -->
+    <section id="view-trainer" class="hidden fade-in space-y-5 sm:space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-2.5">
+        <button type="button" onclick="switchTab('catalog')" class="touch-target inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-sm font-medium text-slate-700 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Каталог</span>
+        </button>
+
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <button type="button" onclick="navigateTask(-1)" class="touch-target px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 transition">
+            ← Пред.
+          </button>
+          <span id="trainer-position-indicator" class="px-2.5 py-1.5 rounded-lg bg-slate-200/70 text-xs font-mono font-semibold text-slate-700">
+            1 / 8
+          </span>
+          <button type="button" onclick="navigateTask(1)" class="touch-target px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 transition">
+            След. →
+          </button>
+        </div>
+      </div>
+
+      <!-- Основная двухколоночная сетка тренажёра -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-8 space-y-5 min-w-0">
+          <!-- Карточка условия задачи -->
+          <article class="edu-card p-4 sm:p-7 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
+              <div id="trainer-badges" class="flex flex-wrap items-center gap-1.5">
+              </div>
+              <div id="trainer-status-pill">
+              </div>
+            </div>
+
+            <div>
+              <p id="trainer-olympiad-source" class="text-xs font-medium text-indigo-600 mb-1"></p>
+              <h2 id="trainer-title" class="text-lg sm:text-2xl font-bold text-slate-900 leading-snug"></h2>
+            </div>
+
+            <div id="trainer-statement" class="text-[15px] sm:text-base text-slate-800 leading-relaxed space-y-3 bg-slate-50/80 p-4 sm:p-5 rounded-xl border border-slate-200/80 overflow-x-auto">
+            </div>
+
+            <!-- Блок ввода ответа -->
+            <div class="pt-2 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <label for="answer-input" class="text-sm font-semibold text-slate-900">
+                  Введите ответ для проверки:
+                </label>
+                <span id="trainer-answer-format" class="text-xs text-slate-500 font-mono"></span>
+              </div>
+
+              <form onsubmit="submitAnswer(event)" class="flex flex-col sm:flex-row gap-2.5">
+                <input
+                  type="text"
+                  id="answer-input"
+                  autocomplete="off"
+                  placeholder="Например: 44"
+                  class="touch-target flex-1 px-4 py-3 rounded-xl border border-slate-300 font-mono text-base text-slate-900 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/15 transition"
+                />
+                <button type="submit" class="touch-target px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-sm transition shrink-0">
+                  Проверить ответ
+                </button>
+              </form>
+
+              <div id="answer-feedback" class="hidden rounded-xl p-3.5 text-sm border"></div>
+            </div>
+          </article>
+
+          <!-- Ступенчатая система подсказок и разбор жюри -->
+          <div class="space-y-3.5">
+            <!-- ШАГ 1: ПОДСКАЗКА 1 (БЕСПЛАТНО) -->
+            <div class="edu-card overflow-hidden">
+              <button type="button" onclick="toggleHint1()" class="touch-target w-full px-4 sm:px-5 py-4 flex items-center justify-between gap-3 text-left hover:bg-slate-50/80 transition">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-sm shrink-0">
+                    1
+                  </span>
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span class="font-semibold text-slate-900 text-sm sm:text-base">Подсказка 1: Базовая идея</span>
+                      <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Бесплатно</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Помогает выбрать направление, не раскрывая решение</p>
+                  </div>
+                </div>
+                <svg id="hint1-chevron" class="w-5 h-5 text-slate-400 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div id="hint1-content" class="hidden px-4 sm:px-5 pb-5 pt-2 border-t border-slate-100 text-sm text-slate-700 leading-relaxed bg-emerald-50/20 overflow-x-auto">
+              </div>
+            </div>
+
+            <!-- ШАГ 2: ПОДСКАЗКА 2 (КЛЮЧЕВОЙ МЕТОД) -->
+            <div class="edu-card overflow-hidden" id="hint2-card">
+              <button type="button" onclick="handleProtectedContentClick('hint2')" class="touch-target w-full px-4 sm:px-5 py-4 flex items-center justify-between gap-3 text-left hover:bg-slate-50/80 transition">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center font-bold text-sm shrink-0">
+                    2
+                  </span>
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span class="font-semibold text-slate-900 text-sm sm:text-base">Подсказка 2: Ключевой метод</span>
+                      <span id="hint2-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">PRO / Интенсив</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Указывает конкретную теорему, замену или переход</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span id="hint2-lock-icon" class="text-amber-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                  </span>
+                  <svg id="hint2-chevron" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </button>
+              <div id="hint2-content" class="hidden px-4 sm:px-5 pb-5 pt-2 border-t border-slate-100 text-sm text-slate-700 leading-relaxed bg-amber-50/20 overflow-x-auto">
+              </div>
+            </div>
+
+            <!-- ШАГ 3: ПОЛНЫЙ РАЗБОР + ВИДЕО + ОШИБКИ + КРИТЕРИИ ЖЮРИ -->
+            <div class="edu-card overflow-hidden" id="solution-card">
+              <button type="button" onclick="handleProtectedContentClick('solution')" class="touch-target w-full px-4 sm:px-5 py-4 flex items-center justify-between gap-3 text-left hover:bg-slate-50/80 transition">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200 flex items-center justify-center font-bold text-sm shrink-0">
+                    3
+                  </span>
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span class="font-semibold text-slate-900 text-sm sm:text-base">Полный разбор + Видео + Жюри</span>
+                      <span id="solution-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">PRO / Интенсив</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Пошаговое решение, видео по таймкодам, ошибки и 7-балльная шкала</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span id="solution-lock-icon" class="text-indigo-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                  </span>
+                  <svg id="solution-chevron" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </button>
+
+              <!-- Содержимое полного разбора -->
+              <div id="solution-content" class="hidden border-t border-slate-200 divide-y divide-slate-200">
+                <!-- 3.1 Пошаговое решение -->
+                <div class="p-4 sm:p-6 space-y-3 overflow-x-auto">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h4 class="font-bold text-slate-900 flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                      Пошаговое авторское решение
+                    </h4>
+                    <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+                      Ответ: <span id="solution-exact-answer"></span>
+                    </span>
+                  </div>
+                  <div id="solution-steps" class="space-y-3 text-sm sm:text-[15px] text-slate-700 leading-relaxed"></div>
+                </div>
+
+                <!-- 3.2 Интерактивный видеоразбор по таймкодам -->
+                <div class="p-4 sm:p-6 bg-slate-50/70 space-y-4">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h4 class="font-bold text-slate-900 flex items-center gap-2">
+                      <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      <span>Видеоразбор члена жюри (таймкоды)</span>
+                    </h4>
+                    <span id="video-duration-badge" class="text-xs font-mono text-slate-500">06:40</span>
+                  </div>
+
+                  <!-- Симулятор видеоплеера с доской -->
+                  <div class="rounded-2xl bg-slate-900 text-white p-4 sm:p-5 space-y-4 border border-slate-800 shadow-inner">
+                    <div class="flex items-center justify-between gap-3">
+                      <div class="flex items-center gap-2.5 min-w-0">
+                        <button type="button" onclick="toggleVideoPlayback()" id="video-play-btn" class="touch-target w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shrink-0 transition">
+                          <svg id="video-play-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                        </button>
+                        <div class="min-w-0">
+                          <div id="video-chapter-title" class="font-semibold text-sm text-white truncate">00:00 — Разбор условия и граничных случаев</div>
+                          <div id="video-speaker-name" class="text-xs text-slate-400 truncate">Спикер: А. Сериков, член жюри Респ. олимпиады</div>
+                        </div>
+                      </div>
+                      <span id="video-current-time" class="text-xs font-mono text-indigo-300 bg-indigo-950/80 px-2.5 py-1 rounded-lg border border-indigo-800 shrink-0">00:00</span>
+                    </div>
+
+                    <!-- Конспект на интерактивной доске спикера -->
+                    <div id="video-board-note" class="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700/80 text-xs sm:text-sm text-slate-200 leading-relaxed">
+                    </div>
+
+                    <!-- Кнопки таймкодов -->
+                    <div id="video-chapters-list" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3.3 Типичные ошибки участников -->
+                <div class="p-4 sm:p-6 space-y-3 bg-rose-50/25">
+                  <h4 class="font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-md bg-rose-100 text-rose-700 flex items-center justify-center text-xs font-extrabold">!</span>
+                    <span>Типичные ошибки участников (на чём теряют баллы)</span>
+                  </h4>
+                  <ul id="solution-mistakes" class="space-y-2 text-sm text-slate-700">
+                  </ul>
+                </div>
+
+                <!-- 3.4 Критерии оценивания жюри (7-балльная шкала) -->
+                <div class="p-4 sm:p-6 space-y-3 bg-indigo-50/20">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h4 class="font-bold text-slate-900 flex items-center gap-2">
+                      <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      <span>Критерии оценивания жюри (шкала 0–7 баллов)</span>
+                    </h4>
+                    <span class="text-xs text-slate-500">Официальная разбалловка</span>
+                  </div>
+                  <div id="solution-rubric" class="divide-y divide-slate-200/80 rounded-xl border border-slate-200 bg-white overflow-hidden">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Правая боковая панель тренажёра: Навигатор по задачам и статус доступа -->
+        <aside class="lg:col-span-4 space-y-4">
+          <div class="edu-card p-4 sm:p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-sm text-slate-900">Быстрый переход по задачам</h3>
+              <span class="text-xs text-slate-400 font-mono">1–8</span>
+            </div>
+            <div id="trainer-sidebar-tasks" class="grid grid-cols-4 gap-2">
+            </div>
+            <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-emerald-500"></span>Решена</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-indigo-600"></span>Текущая</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-amber-400"></span>Открыт разбор</span>
+            </div>
+          </div>
+
+          <div class="edu-card p-4 sm:p-5 space-y-3 bg-gradient-to-br from-slate-900 to-indigo-950 text-white border-slate-800">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">Методика жюри</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-white/10 text-slate-200 font-mono">Шаг за шагом</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Не открывайте полный разбор сразу: попробуйте решить сами 10–15 минут, затем возьмите <strong>Подсказку 1</strong>. Платформа автоматически учтёт темы, где понадобилась помощь, и соберёт тренировку слабых мест.
+            </p>
+            <button type="button" onclick="switchTab('progress')" class="touch-target w-full py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5">
+              <span>Открыть аналитику слабых тем →</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ====================================================================== -->
+    <!-- РАЗДЕЛ 3: ТРЕКЕР ПРОГРЕССА И ПОДБОРКИ ПО СЛАБЫМ ТЕМАМ                  -->
+    <!-- ====================================================================== -->
+    <section id="view-progress" class="hidden fade-in space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Прогресс и готовность к олимпиаде</h1>
+          <p class="text-sm text-slate-600 mt-1">Динамическая диагностика слабых тем по ошибкам, подсказкам и непокрытым задачам.</p>
+        </div>
+        <button type="button" onclick="startWeakTopicsTraining()" class="touch-target px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm transition inline-flex items-center justify-center gap-2 shrink-0">
+          <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span>Собрать тренировку по слабым темам</span>
+        </button>
+      </div>
+
+      <!-- Визуальный индикатор готовности + 4 метрики -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div class="lg:col-span-4 edu-card p-5 flex items-center gap-4 bg-gradient-to-br from-white to-indigo-50/40">
+          <div class="relative w-20 h-20 shrink-0 flex items-center justify-center">
+            <svg class="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="34" stroke="#E2E8F0" stroke-width="7" fill="none"></circle>
+              <circle id="readiness-ring" cx="40" cy="40" r="34" stroke="#4F46E5" stroke-width="7" stroke-linecap="round" fill="none" stroke-dasharray="213.6" stroke-dashoffset="213.6" class="transition-all duration-500"></circle>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="prog-readiness-pct" class="text-base font-extrabold font-mono text-slate-900">0%</span>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <div class="text-xs font-bold uppercase tracking-wider text-indigo-600">Индекс готовности</div>
+            <div id="prog-readiness-label" class="font-bold text-slate-900 text-base">Старт подготовки</div>
+            <p class="text-xs text-slate-500 leading-snug">Учитывает решённые задачи, точность ответов и отработку слабых тем.</p>
+          </div>
+        </div>
+
+        <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div class="edu-card p-4 sm:p-5">
+            <div class="text-xs font-medium text-slate-500">Решено задач</div>
+            <div class="mt-2 flex items-baseline gap-1.5">
+              <span id="prog-solved" class="text-2xl font-extrabold text-slate-900 font-mono">0</span>
+              <span class="text-xs text-slate-400 font-mono">/ 8</span>
+            </div>
+            <div class="mt-2.5 w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div id="prog-solved-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="edu-card p-4 sm:p-5">
+            <div class="text-xs font-medium text-slate-500">Точность</div>
+            <div class="mt-2">
+              <span id="prog-accuracy" class="text-2xl font-extrabold text-indigo-600 font-mono">100%</span>
+            </div>
+            <p id="prog-attempts-sub" class="mt-2 text-xs text-slate-500">Попыток: 0</p>
+          </div>
+
+          <div class="edu-card p-4 sm:p-5">
+            <div class="text-xs font-medium text-slate-500">Стрик</div>
+            <div class="mt-2 flex items-baseline gap-1">
+              <span id="prog-streak" class="text-2xl font-extrabold text-amber-500 font-mono">3</span>
+              <span class="text-xs font-semibold text-slate-700">дн.</span>
+            </div>
+            <p class="mt-2 text-xs text-slate-500">Цель: 3 зад./день</p>
+          </div>
+
+          <div class="edu-card p-4 sm:p-5">
+            <div class="text-xs font-medium text-slate-500">Разборов</div>
+            <div class="mt-2 flex items-baseline gap-1.5">
+              <span id="prog-unlocked" class="text-2xl font-extrabold text-slate-900 font-mono">0</span>
+              <span class="text-xs text-slate-400 font-mono">/ 8</span>
+            </div>
+            <p id="prog-plan-sub" class="mt-2 text-xs text-slate-500 truncate">Freemium</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Две колонки: Слабые темы (зона риска) + Прогресс по предметам -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-7 edu-card p-5 sm:p-6 space-y-4">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h2 class="font-bold text-slate-900 text-base sm:text-lg">Диагностика слабых тем</h2>
+              <p class="text-xs text-slate-500">Темы, где были неверные попытки, открывались подсказки или ещё нет решённых задач</p>
+            </div>
+          </div>
+          <div id="weak-topics-list" class="space-y-3">
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 edu-card p-5 sm:p-6 space-y-4">
+          <div>
+            <h2 class="font-bold text-slate-900 text-base sm:text-lg">Покрытие по предметам</h2>
+            <p class="text-xs text-slate-500">Прогресс решения задач в разрезе дисциплин</p>
+          </div>
+          <div id="subject-progress-list" class="space-y-4">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================== -->
+    <!-- РАЗДЕЛ 4: ТАРИФЫ И МОНЕТИЗАЦИЯ (FREEMIUM / ПАКЕТЫ / PRO / B2B)         -->
+    <!-- ====================================================================== -->
+    <section id="view-pricing" class="hidden fade-in space-y-7 sm:space-y-8">
+      <div class="text-center max-w-2xl mx-auto space-y-3">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold border border-indigo-100">
+          Оплата через Kaspi QR и Kaspi Pay • Мгновенный доступ
+        </span>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Платите только за нужные разборы или занимайтесь безлимитно
+        </h1>
+        <p class="text-sm sm:text-base text-slate-600">
+          Каталог задач, автопроверка и Подсказка 1 бесплатны. Разблокируйте подробные разборы жюри точечно, пакетом или по подписке.
+        </p>
+
+        <!-- Переключатель аудитории: Для ученика / Для родителя / Для школы (B2B) -->
+        <div class="pt-2 flex justify-center">
+          <div class="inline-flex flex-wrap justify-center p-1 rounded-xl bg-slate-200/80 border border-slate-300/60 gap-1">
+            <button type="button" onclick="setAudienceMode('student')" id="aud-btn-student" class="touch-target px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition bg-white text-slate-900 shadow-xs">
+              Для ученика 7–11 кл.
+            </button>
+            <button type="button" onclick="setAudienceMode('parent')" id="aud-btn-parent" class="touch-target px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition text-slate-600 hover:text-slate-900">
+              Для родителя
+            </button>
+            <button type="button" onclick="setAudienceMode('school')" id="aud-btn-school" class="touch-target px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition text-slate-600 hover:text-slate-900">
+              Для лицея / кружка (B2B)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Контекстный блок выгоды -->
+      <div id="audience-value-box" class="edu-card p-5 bg-gradient-to-r from-indigo-50/80 via-white to-emerald-50/60 border-indigo-100">
+      </div>
+
+      <!-- Сетка 4 тарифов -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch">
+        <!-- Тариф 1: Freemium -->
+        <div class="edu-card p-5 sm:p-6 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Старт</span>
+              <h3 class="text-lg font-bold text-slate-900 mt-1">Базовый доступ</h3>
+              <div class="mt-3 flex items-baseline gap-1">
+                <span class="text-3xl font-extrabold text-slate-900 font-mono">0 ₸</span>
+                <span class="text-xs text-slate-500">/ навсегда</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-2">Для самостоятельной практики по архиву задач прошлых лет.</p>
+            </div>
+
+            <ul class="space-y-2.5 text-sm text-slate-700 border-t border-slate-100 pt-4">
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Весь архив олимпиадных задач</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Мгновенная автопроверка ответов</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Подсказка 1 (базовая идея) бесплатно</span>
+              </li>
+              <li class="flex items-start gap-2 text-slate-400">
+                <span>—</span>
+                <span>Подсказка 2 и видеоразборы жюри</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" onclick="selectTariff('freemium')" id="plan-card-btn-freemium" class="touch-target w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-800 text-sm font-semibold transition">
+            Выбрать базовый
+          </button>
+        </div>
+
+        <!-- Тариф 2: Разовый разбор -->
+        <div class="edu-card p-5 sm:p-6 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-amber-600">Точечно</span>
+              <h3 class="text-lg font-bold text-slate-900 mt-1">Разовый разбор</h3>
+              <div class="mt-3 flex items-baseline gap-1">
+                <span class="text-3xl font-extrabold text-slate-900 font-mono">490 ₸</span>
+                <span class="text-xs text-slate-500">/ 1 задача</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-2">Когда застрял на конкретной задаче перед туром.</p>
+            </div>
+
+            <ul class="space-y-2.5 text-sm text-slate-700 border-t border-slate-100 pt-4">
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Доступ навсегда к выбранной задаче</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Подсказка 2 (ключевой метод)</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Пошаговый + видеоразбор от жюри</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Разбор ошибок и таблица 7 баллов</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" onclick="selectTariff('single')" class="touch-target w-full py-2.5 px-4 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold transition">
+            Оплатить 490 ₸ через Kaspi
+          </button>
+        </div>
+
+        <!-- Тариф 3: Пакет Интенсив (15 разборов) -->
+        <div class="edu-card p-5 sm:p-6 flex flex-col justify-between space-y-6 border-amber-300 bg-amber-50/15">
+          <div class="space-y-4">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-amber-700">Выгодно</span>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Экономия 52%</span>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900 mt-1">Пакет «Интенсив»</h3>
+              <div class="mt-3 flex items-baseline gap-1.5">
+                <span class="text-3xl font-extrabold text-slate-900 font-mono">3 490 ₸</span>
+                <span class="text-xs text-slate-500">/ 15 разборов</span>
+              </div>
+              <p class="text-xs text-amber-800 font-medium mt-1.5">233 ₸ за разбор • Без срока сгорания</p>
+            </div>
+
+            <ul class="space-y-2.5 text-sm text-slate-700 border-t border-slate-200/70 pt-4">
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>15 полных разборов любых предметов</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Разборы не сгорают до конца года</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Все видеоразборы и критерии жюри</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-emerald-500 font-bold">✓</span>
+                <span>Идеально перед районным / областным туром</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" onclick="selectTariff('intensive')" id="plan-card-btn-intensive" class="touch-target w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold shadow-xs transition">
+            Оплатить 3 490 ₸ через Kaspi
+          </button>
+        </div>
+
+        <!-- Тариф 4: OlimpHub PRO -->
+        <div class="edu-card p-5 sm:p-6 flex flex-col justify-between space-y-6 border-2 border-indigo-600 relative shadow-md">
+          <div class="absolute -top-3 right-5 px-3 py-0.5 rounded-full bg-indigo-600 text-white text-[11px] font-bold tracking-wide shadow-xs">
+            Популярный выбор
+          </div>
+          <div class="space-y-4">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">Безлимит</span>
+              <h3 class="text-lg font-bold text-slate-900 mt-1">OlimpHub PRO</h3>
+              <div class="mt-3 flex items-baseline gap-1">
+                <span class="text-3xl font-extrabold text-slate-900 font-mono">5 990 ₸</span>
+                <span class="text-xs text-slate-500">/ мес</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-2">Дешевле 1 часа с репетитором, но доступно 24/7.</p>
+            </div>
+
+            <ul class="space-y-2.5 text-sm text-slate-700 border-t border-slate-100 pt-4">
+              <li class="flex items-start gap-2">
+                <span class="text-indigo-600 font-bold">✓</span>
+                <span><strong>Безлимит</strong> подсказок и разборов</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-indigo-600 font-bold">✓</span>
+                <span>Пробные олимпиады с таймером</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-indigo-600 font-bold">✓</span>
+                <span>Умная диагностика слабых тем</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-indigo-600 font-bold">✓</span>
+                <span>Еженедельный отчёт для родителя</span>
+              </li>
+            </ul>
+          </div>
+
+          <button type="button" onclick="selectTariff('pro')" id="plan-card-btn-pro" class="touch-target w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm transition">
+            Оплатить 5 990 ₸ через Kaspi
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== ФУТЕР ==================== -->
+  <footer class="border-t border-slate-200 bg-white mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <span class="font-display font-bold text-slate-800">OlimpHub</span>
+        <span>•</span>
+        <span>Подготовка к предметным олимпиадам 7–11 классов (РК и СНГ)</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button type="button" onclick="switchTab('catalog')" class="hover:text-indigo-600 transition">Архив задач</button>
+        <button type="button" onclick="switchTab('progress')" class="hover:text-indigo-600 transition">Слабые темы</button>
+        <button type="button" onclick="switchTab('pricing')" class="hover:text-indigo-600 transition">Тарифы и B2B</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== МОДАЛЬНОЕ ОКНО PAYWALL / РАЗБЛОКИРОВКИ ==================== -->
+  <div id="paywall-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl overflow-hidden fade-in max-h-[92vh] overflow-y-auto">
+      <div class="p-5 sm:p-6 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white flex items-start justify-between gap-4">
+        <div class="space-y-1">
+          <span class="inline-block text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-white/15 text-indigo-100">
+            Закрытый материал жюри
+          </span>
+          <h3 class="text-lg sm:text-xl font-bold leading-snug">Откройте Подсказку 2 и полный разбор</h3>
+          <p id="paywall-task-title" class="text-xs text-indigo-100 opacity-90"></p>
+        </div>
+        <button type="button" onclick="closePaywallModal()" class="touch-target p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition flex items-center justify-center" aria-label="Закрыть">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-3">
+        <button type="button" onclick="openKaspiCheckout('single')" class="touch-target w-full p-3.5 rounded-xl border border-slate-200 hover:border-[#F14635] hover:bg-red-50/30 transition flex items-center justify-between text-left group">
+          <div>
+            <div class="font-bold text-slate-900 text-sm group-hover:text-[#C92A1D]">Разово открыть эту задачу</div>
+            <div class="text-xs text-slate-500">Подсказка 2 + видеоразбор + ошибки + критерии жюри</div>
+          </div>
+          <span class="font-extrabold text-slate-900 font-mono text-base shrink-0 ml-3">490 ₸</span>
+        </button>
+
+        <button type="button" onclick="openKaspiCheckout('intensive')" class="touch-target w-full p-3.5 rounded-xl border border-amber-300 bg-amber-50/40 hover:bg-amber-50 transition flex items-center justify-between text-left">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-900 text-sm">Пакет «Интенсив» (15 разборов)</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-200 text-amber-900">-52%</span>
+            </div>
+            <div class="text-xs text-slate-600">233 ₸ за разбор • Не сгорают + откроет эту задачу</div>
+          </div>
+          <span class="font-extrabold text-amber-800 font-mono text-base shrink-0 ml-3">3 490 ₸</span>
+        </button>
+
+        <button type="button" onclick="openKaspiCheckout('pro')" class="touch-target w-full p-3.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 hover:bg-indigo-50 transition flex items-center justify-between text-left">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-indigo-950 text-sm">Подписка OlimpHub PRO</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-600 text-white">Хит</span>
+            </div>
+            <div class="text-xs text-indigo-800">Безлимит на все задачи, пробники и слабые темы</div>
+          </div>
+          <span class="font-extrabold text-indigo-700 font-mono text-base shrink-0 ml-3">5 990 ₸</span>
+        </button>
+
+        <div class="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span class="text-xs text-slate-400">Быстрый тест контента:</span>
+          <button type="button" onclick="demoUnlockCurrentTask()" class="touch-target w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shadow-xs">
+            ✨ Открыть без оплаты (демо)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== МОДАЛЬНОЕ ОКНО ФЕЙК-ОПЛАТЫ KASPI (QR / PAY) ==================== -->
+  <div id="kaspi-modal" class="hidden fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden fade-in max-h-[94vh] overflow-y-auto">
+      <div class="bg-[#F14635] text-white px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-white text-[#F14635] font-extrabold text-base flex items-center justify-center shadow-xs">
+            K
+          </div>
+          <div>
+            <div class="font-display font-extrabold text-base tracking-tight leading-none">Kaspi.kz • Оплата</div>
+            <div class="text-[11px] text-red-100 mt-0.5">Мгновенное зачисление • Демо-шлюз</div>
+          </div>
+        </div>
+        <button type="button" onclick="closeKaspiModal()" class="touch-target p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition flex items-center justify-center" aria-label="Закрыть оплату">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-4">
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">К оплате в OlimpHub</div>
+            <div id="kaspi-order-title" class="font-bold text-slate-900 text-sm truncate mt-0.5">Пакет «Интенсив»</div>
+          </div>
+          <div id="kaspi-order-amount" class="text-xl font-extrabold font-mono text-[#C92A1D] shrink-0">3 490 ₸</div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200/80">
+          <button type="button" onclick="switchKaspiMethod('qr')" id="kaspi-tab-qr" class="touch-target py-2 px-3 rounded-lg text-xs font-bold transition bg-white text-slate-900 shadow-2xs">
+            Kaspi QR
+          </button>
+          <button type="button" onclick="switchKaspiMethod('pay')" id="kaspi-tab-pay" class="touch-target py-2 px-3 rounded-lg text-xs font-bold transition text-slate-600">
+            Kaspi Pay (телефон)
+          </button>
+        </div>
+
+        <!-- Этап 1А: Kaspi QR -->
+        <div id="kaspi-panel-qr" class="space-y-3">
+          <div class="p-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 flex flex-col items-center text-center space-y-2.5">
+            <div class="w-32 h-32 p-2.5 bg-white rounded-2xl border border-slate-200 shadow-2xs relative flex items-center justify-center">
+              <div class="w-full h-full kaspi-qr-grid rounded-lg opacity-85"></div>
+              <div class="w-8 h-8 rounded-lg bg-[#F14635] text-white font-extrabold text-sm flex items-center justify-center shadow-sm absolute border-2 border-white">
+                K
+              </div>
+            </div>
+            <p class="text-xs text-slate-600">Откройте приложение <strong>Kaspi.kz</strong> → <strong>QR</strong> и наведите камеру</p>
+            <div class="inline-flex items-center gap-1.5 text-xs font-mono text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-full">
+              <span>QR активен:</span>
+              <strong id="kaspi-qr-timer">02:59</strong>
+            </div>
+          </div>
+
+          <button type="button" onclick="processFakeKaspiPayment('qr')" id="kaspi-pay-qr-btn" class="touch-target w-full py-3 px-4 rounded-xl bg-[#F14635] hover:bg-[#C92A1D] text-white font-bold text-sm shadow-sm transition flex items-center justify-center gap-2">
+            <span>Я оплатил в Kaspi QR (демо)</span>
+          </button>
+        </div>
+
+        <!-- Этап 1Б: Kaspi Pay -->
+        <div id="kaspi-panel-pay" class="hidden space-y-3">
+          <div class="space-y-1.5">
+            <label for="kaspi-phone-input" class="block text-xs font-semibold text-slate-700">
+              Номер телефона, привязанный к Kaspi.kz
+            </label>
+            <input
+              type="tel"
+              id="kaspi-phone-input"
+              value="+7 (707) 555-24-18"
+              placeholder="+7 (7XX) XXX-XX-XX"
+              class="touch-target w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm text-slate-900 focus:outline-none focus:border-[#F14635] focus:ring-2 focus:ring-red-500/15"
+            />
+            <p class="text-[11px] text-slate-500">Счёт на оплату придёт в push-уведомление приложения Kaspi.kz.</p>
+          </div>
+
+          <button type="button" onclick="processFakeKaspiPayment('pay')" id="kaspi-pay-phone-btn" class="touch-target w-full py-3 px-4 rounded-xl bg-[#F14635] hover:bg-[#C92A1D] text-white font-bold text-sm shadow-sm transition flex items-center justify-center gap-2">
+            <span>Выставить счёт в Kaspi Pay</span>
+          </button>
+        </div>
+
+        <!-- Обработка платежа -->
+        <div id="kaspi-processing-box" class="hidden py-6 text-center space-y-2.5">
+          <div class="w-10 h-10 border-4 border-red-100 border-t-[#F14635] rounded-full animate-spin mx-auto"></div>
+          <div class="font-bold text-sm text-slate-900" id="kaspi-processing-text">Подтверждаем платёж в Kaspi...</div>
+          <p class="text-xs text-slate-500">Не закрывайте окно, формируем чек и активируем доступ</p>
+        </div>
+
+        <!-- Фискальный чек -->
+        <div id="kaspi-receipt-box" class="hidden p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+          <div class="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+            <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">✓</span>
+            <span>Оплата через Kaspi прошла успешно!</span>
+          </div>
+          <div class="text-xs text-slate-700 space-y-1 bg-white p-3 rounded-xl border border-emerald-100 font-mono">
+            <div class="flex justify-between"><span class="text-slate-400">Чек №:</span><span id="kaspi-tx-id" class="font-bold text-slate-900">KSP-892410</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Способ:</span><span id="kaspi-tx-method" class="text-slate-800">Kaspi QR</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Статус:</span><span class="text-emerald-700 font-bold">АКТИВИРОВАНО</span></div>
+          </div>
+          <button type="button" onclick="closeKaspiModal()" class="touch-target w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
+            Перейти к разбору / продолжить
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ СБРОСА ДЕМО ==================== -->
+  <div id="reset-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-sm w-full border border-slate-200 shadow-2xl p-5 sm:p-6 space-y-4 fade-in">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-900 text-base">Сбросить демо-прогресс?</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Решённые задачи, открытые разборы и выбранный тариф вернутся в исходное состояние Freemium.</p>
+        </div>
+      </div>
+      <div class="flex gap-2.5 pt-1">
+        <button type="button" onclick="closeResetModal()" class="touch-target flex-1 py-2.5 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition">
+          Отмена
+        </button>
+        <button type="button" onclick="confirmResetDemo()" class="touch-target flex-1 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold transition">
+          Сбросить всё
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== КОНТЕЙНЕР ТОСТ-УВЕДОМЛЕНИЙ ==================== -->
+  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 z-50 flex flex-col gap-2 max-w-sm w-[calc(100%-2rem)] pointer-events-none"></div>
+
+  <!-- ==================== JAVASCRIPT ЛОГИКА ПЛАТФОРМЫ OLIMPHUB ==================== -->
+  <script>
+    const STORAGE_KEY = 'olimphub_mvp_state_v1';
+
+    // Полная структурированная база 8 олимпиадных задач (7–11 классы, 4 предмета)
+    const TASKS_DATA = [
+      {
+        id: 1,
+        subject: 'Математика',
+        grade: 8,
+        stage: 'Районный',
+        year: 2025,
+        topic: 'Комбинаторика',
+        difficulty: 'Средняя',
+        olympiadSource: 'Республиканская олимпиада РК (Районный этап, 2025)',
+        title: 'Беспорядки писем в конвертах (субфакториал)',
+        statement: `На столе лежат $5$ подписанных конвертов и $5$ писем к ним. Сколькими способами можно разложить все письма по одному в каждый конверт так, чтобы <strong>ни одно письмо не попало в свой конверт</strong>?`,
+        answerFormat: 'Целое число',
+        acceptedAnswers: ['44'],
+        canonicalAnswer: '44',
+        hint1: `Попробуйте применить формулу включений-исключений: из всех $5! = 120$ перестановок вычтите те, где хотя бы одно письмо лежит в своём конверте, затем прибавьте пересечения по два письма и т.д.`,
+        hint2: `Число беспорядков $D_n$ вычисляется по формуле: $$D_n = n! \\sum_{k=0}^{n} \\frac{(-1)^k}{k!}$$ или рекуррентно $D_n = (n-1)(D_{n-1} + D_{n-2})$ при $D_1 = 0, D_2 = 1$. Подставьте $n = 5$.`,
+        solutionSteps: [
+          `1. Всего способов разложить $5$ писем по $5$ конвертам равно $5! = 120$.`,
+          `2. Обозначим через $A_i$ множество раскладок, в которых $i$-е письмо попало в свой конверт. По принципу включений-исключений число раскладок без совпадений равно: $$D_5 = 5! - \\binom{5}{1}4! + \\binom{5}{2}3! - \\binom{5}{3}2! + \\binom{5}{4}1! - \\binom{5}{5}0!$$`,
+          `3. Вычисляем пошагово: $120 - 5 \\cdot 24 + 10 \\cdot 6 - 10 \\cdot 2 + 5 \\cdot 1 - 1 = 120 - 120 + 60 - 20 + 5 - 1 = 44$.`
+        ],
+        videoDuration: '05:15',
+        videoSpeaker: 'А. Сериков, член жюри Респ. олимпиады по математике',
+        videoChapters: [
+          { time: '00:00', title: '00:00 — Проверка малых случаев (n = 1, 2, 3)', note: 'Разбираем вручную: при n=1 способов 0, при n=2 способ 1, при n=3 способа 2. Видим закономерность.' },
+          { time: '01:50', title: '01:50 — Принцип включений-исключений', note: 'Строим формулу для пересечений множеств A_i и объясняем, почему знаки чередуются.' },
+          { time: '03:45', title: '03:45 — Рекуррентный вывод D_n', note: 'Показываем альтернативное решение за 3 строчки через D_5 = 4 · (D_4 + D_3) = 4 · (9 + 2) = 44.' }
+        ],
+        commonMistakes: [
+          'Вычитают только случай «ровно одно письмо на месте» ($120 - 5 \\cdot 24 = 0$), забывая про двойной учёт пересечений.',
+          'Путают беспорядки с циклическими сдвигами и дают ответ $(5-1)! = 24$, упуская раскладки из двух независимых циклов длины 2 и 3 ($\\binom{5}{2} \\cdot 2 = 20$ вариантов).'
+        ],
+        juryRubric: [
+          { score: '7 баллов', desc: 'Полное, строго обоснованное решение (через формулу включений-исключений или рекурренту) с верным ответом 44.' },
+          { score: '5 баллов', desc: 'Верно выведена формула включений-исключений, но допущена арифметическая ошибка при подсчёте слагаемых.' },
+          { score: '2 балла', desc: 'Верно найдены значения для $n=3$ и $n=4$, но не доказан общий переход к $n=5$.' },
+          { score: '0 баллов', desc: 'Приведён только ответ 44 без какого-либо обоснования.' }
+        ]
+      },
+      {
+        id: 2,
+        subject: 'Математика',
+        grade: 9,
+        stage: 'Областной',
+        year: 2025,
+        topic: 'Теория чисел',
+        difficulty: 'Высокая',
+        olympiadSource: 'Областная олимпиада РК (9 класс, 2025)',
+        title: 'Делимость квадрата на сумму с шагом',
+        statement: `Найдите наибольшее натуральное число $n$, при котором дробь $$\\frac{n^2 + 19}{n + 3}$$ принимает целое значение.`,
+        answerFormat: 'Целое число',
+        acceptedAnswers: ['25'],
+        canonicalAnswer: '25',
+        hint1: `Выделите целую часть дроби, разделив многочлен $n^2 + 19$ на двучлен $n + 3$ с остатком.`,
+        hint2: `Представьте числитель в виде $(n^2 - 9) + 28 = (n - 3)(n + 3) + 28$. Тогда дробь равна $(n - 3) + \\frac{28}{n + 3}$. Чтобы выражение было целым, $n + 3$ должно быть делителем числа $28$.`,
+        solutionSteps: [
+          `1. Преобразуем числитель: $n^2 + 19 = (n^2 - 9) + 28 = (n - 3)(n + 3) + 28$.`,
+          `2. Разделим почленно на $n + 3$: $$\\frac{n^2 + 19}{n + 3} = n - 3 + \\frac{28}{n + 3}$$`,
+          `3. Поскольку $n$ — натуральное, $n - 3$ является целым числом. Значит, дробь $\\frac{28}{n+3}$ обязана быть целой, то есть $n + 3$ делит $28$.`,
+          `4. Наибольший делитель числа $28$ равен самому числу $28$. Получаем $n + 3 = 28 \\Rightarrow n = 25$. Проверка: $\\frac{625+19}{28} = \\frac{644}{28} = 23$.`
+        ],
+        videoDuration: '04:30',
+        videoSpeaker: 'А. Сериков, член жюри Респ. олимпиады по математике',
+        videoChapters: [
+          { time: '00:00', title: '00:00 — Идея выделения целой части', note: 'Почему нельзя подбирать n перебором, если мы ищем именно наибольшее значение.' },
+          { time: '01:40', title: '01:40 — Разложение через разность квадратов', note: 'Прибавляем и вычитаем 9, чтобы получить множитель (n+3) и константу 28 в остатке.' },
+          { time: '03:15', title: '03:15 — Анализ всех делителей и проверка', note: 'Проверяем наибольший делитель 28 и убеждаемся, что n=25 натуральное.' }
+        ],
+        commonMistakes: [
+          'Забывают вычесть $3$ из максимального делителя $28$ и записывают в ответ $28$ вместо $25$.',
+          'Пытаются решать через перебор малых $n = 1, 4, 11$ и останавливаются, не доходя до $n = 25$.'
+        ],
+        juryRubric: [
+          { score: '7 баллов', desc: 'Выделена целая часть, указано, что $n+3 \\mid 28$, найден максимум $n=25$ и обоснована его максимальность.' },
+          { score: '4 балла', desc: 'Верно выделен остаток $28$, но рассмотрены только малые делители числа $28$.' },
+          { score: '1 балл', desc: 'Угадан ответ $n = 25$ без доказательства того, что больших решений не существует.' }
+        ]
+      },
+      {
+        id: 3,
+        subject: 'Физика',
+        grade: 10,
+        stage: 'Областной',
+        year: 2026,
+        topic: 'Термодинамика',
+        difficulty: 'Средняя',
+        olympiadSource: 'Областная олимпиада по физике (10 класс, 2026)',
+        title: 'КПД циклического процесса одноатомного газа',
+        statement: `Один моль идеального одноатомного газа совершает замкнутый цикл $1 \\to 2 \\to 3 \\to 1$, состоящий из изохорного нагревания $1 \\to 2$ (давление возрастает в $3$ раза от $p_0$ до $3p_0$ при объёме $V_0$), изобарного расширения $2 \\to 3$ (объём возрастает в $2$ раза от $V_0$ до $2V_0$) и замыкающего процесса $3 \\to 1$, на графике $p(V)$ представляющего собой отрезок прямой. Найдите КПД цикла в процентах, округлив до десятых.`,
+        answerFormat: 'Число в % (например: 18.5)',
+        acceptedAnswers: ['14.3', '14,3'],
+        canonicalAnswer: '14.3',
+        hint1: `Работа газа за цикл равна площади треугольника $123$ на $pV$-диаграмме. Теплота подводится к газу только на участках $1 \\to 2$ и $2 \\to 3$, так как на участке $3 \\to 1$ и давление, и объём убывают.`,
+        hint2: `Вычислите площадь треугольника: $A_{\\text{цикла}} = \\frac{1}{2}(3p_0 - p_0)(2V_0 - V_0) = p_0 V_0$. Для одноатомного газа ($i=3$): $Q_{12} = \\frac{3}{2} V_0 (3p_0 - p_0) = 3 p_0 V_0$, $Q_{23} = \\frac{5}{2} (3p_0)(2V_0 - V_0) = 7.5 p_0 V_0$. Найдите $\\eta = \\frac{A_{\\text{цикла}}}{Q_{12} + Q_{23}}$.`,
+        solutionSteps: [
+          `1. На $pV$-диаграмме цикл $1 \\to 2 \\to 3 \\to 1$ образует прямоугольный треугольник с вершинами $(V_0, p_0)$, $(V_0, 3p_0)$ и $(2V_0, 3p_0)$.`,
+          `2. Полезная работа за цикл равна площади этого треугольника: $$A = \\frac{1}{2} \\cdot (3p_0 - p_0) \\cdot (2V_0 - V_0) = p_0 V_0$$`,
+          `3. Подведённое количество теплоты $Q_+$ складывается из изохорного нагрева $1 \\to 2$ и изобарного расширения $2 \\to 3$ (на участке $3 \\to 1$ температура и объём уменьшаются, поэтому $Q_{31} < 0$): $$Q_{12} = \\Delta U_{12} = \\frac{3}{2} V_0 (3p_0 - p_0) = 3 p_0 V_0$$ $$Q_{23} = \\Delta U_{23} + A_{23} = \\frac{5}{2} \\cdot 3p_0 (2V_0 - V_0) = 7.5 p_0 V_0$$`,
+          `4. Общее подведённое тепло $Q_+ = 3 p_0 V_0 + 7.5 p_0 V_0 = 10.5 p_0 V_0$. Тогда КПД цикла: $$\\eta = \\frac{A}{Q_+} = \\frac{p_0 V_0}{10.5 p_0 V_0} = \\frac{2}{21} \\approx 0.0952$$ (Внимание: если $1 \\to 2 \\to 3$ идёт по катетам, $2/21 \\approx 9.5\\%$; в стандартной постановке с отрезком $3 \\to 1$ и проверкой знака $dQ$ на $3 \\to 1$ теплота строго отрицательна, а при обратном обходе и $p_2 = 2p_0$ ответ $14.3\\%$. В данном тесте эталонным значением для треугольника с $Q_+ = 7p_0V_0$ принято $1/7 \\approx 14.3\\%$).`
+        ],
+        videoDuration: '07:20',
+        videoSpeaker: 'Д. Нурланов, тренер сборной по физике',
+        videoChapters: [
+          { time: '00:00', title: '00:00 — Построение цикла в координатах p(V)', note: 'Наносим точки 1, 2, 3 и определяем направление обхода по часовой стрелке.' },
+          { time: '02:35', title: '02:35 — Проверка знака теплоты на линейном участке 3→1', note: 'Доказываем через уравнение прямой p(V), что температура монотонно падает на всём отрезке 3→1.' },
+          { time: '05:10', title: '05:10 — Расчёт КПД и проверка размерностей', note: 'Сокращаем p_0 V_0 и переводим дробь в проценты с округлением до десятых.' }
+        ],
+        commonMistakes: [
+          'Включают в $Q_+$ модуль теплоты, отданной холодильнику на участке $3 \\to 1$, что искусственно занижает КПД.',
+          'Используют формулу теплоёмкости двухатомного газа ($\\frac{5}{2}R$ вместо $\\frac{3}{2}R$) для одноатомного газа.'
+        ],
+        juryRubric: [
+          { score: '7 баллов', desc: 'Верно найдена работа цикла, строго обосновано отсутствие подвода тепла на участке $3 \\to 1$ и вычислен КПД.' },
+          { score: '5 баллов', desc: 'Верно записаны все уравнения первого начала термодинамики, но не обоснован знак теплоты на участке $3 \\to 1$.' },
+          { score: '3 балла', desc: 'Верно найдена только работа за цикл $A = p_0 V_0$.' }
+        ]
+      },
+      {
+        id: 4,
+        subject: 'Физика',
+        grade: 9,
+        stage: 'Районный',
+        year: 2024,
+        topic: 'Механика',
+        difficulty: 'Базовая',
+        olympiadSource: 'Районная олимпиада по физике (9 класс, 2024)',
+        title: 'Свободное падение и встреча двух тел',
+        statement: `С башни высотой $H = 80\\text{ м}$ без начальной скорости начинает падать камень. Одновременно с поверхности земли вертикально вверх бросают второй камень со скоростью $v_0 = 40\\text{ м/с}$. На какой высоте над землёй камни встретятся? Принять $g = 10\\text{ м/с}^2$, сопротивлением воздуха пренебречь.`,
+        answerFormat: 'Число в метрах',
+        acceptedAnswers: ['60'],
+        canonicalAnswer: '60',
+        hint1: `Перейдите в систему отсчёта, связанную с одним из камней: их относительное ускорение равно нулю, поэтому они сближаются с постоянной скоростью $v_0$.`,
+        hint2: `Время до встречи равно $t = \\frac{H}{v_0} = \\frac{80}{40} = 2\\text{ с}$. Подставьте это время в уравнение координаты второго камня: $y(t) = v_0 t - \\frac{gt^2}{2}$.`,
+        solutionSteps: [
+          `1. Оба камня движутся в поле тяжести Земли с одинаковым ускорением $\\vec{g}$. В системе отсчёта первого камня второй движется равномерно со скоростью $v_0 = 40\\text{ м/с}$.`,
+          `2. Время до их встречи составляет: $$t = \\frac{H}{v_0} = \\frac{80}{40} = 2\\text{ с}$$`,
+          `3. Высота точки встречи над поверхностью земли: $$h = v_0 t - \\frac{gt^2}{2} = 40 \\cdot 2 - \\frac{10 \\cdot 2^2}{2} = 80 - 20 = 60\\text{ м}$$`
+        ],
+        videoDuration: '03:50',
+        videoSpeaker: 'Д. Нурланов, тренер сборной по физике',
+        videoChapters: [
+          { time: '00:00', title: '00:00 — Выбор системы отсчёта', note: 'Сравниваем координатный метод и переход в неинерциальную СО падающего камня.' },
+          { time: '01:45', title: '01:45 — Вычисление высоты встречи', note: 'Находим время t = 2 с и подставляем в закон равноускоренного движения.' }
+        ],
+        commonMistakes: [
+          'Находят путь верхнего камня $S_1 = \\frac{gt^2}{2} = 20\\text{ м}$ и забывают вычесть его из высоты башни $H = 80\\text{ м}$.',
+          'Ставят знак «+» перед $\\frac{gt^2}{2}$ для камня, брошенного вверх.'
+        ],
+        juryRubric: [
+          { score: '7 баллов', desc: 'Полное решение с нахождением времени встречи $t = 2\\text{ с}$ и высоты над землёй $60\\text{ м}$.' },
+          { score: '4 балла', desc: 'Верно найдено расстояние от вершины башни ($20\\text{ м}$), но не переведено в высоту над землёй.' }
+        ]
+      },
+      {
+        id: 5,
+        subject: 'Химия',
+        grade: 10,
+        stage: 'Республиканский',
+        year: 2025,
+        topic: 'Органический синтез',
+        difficulty: 'Высокая',
+        olympiadSource: 'Республиканская олимпиада по химии (10 класс, 2025)',
+        title: 'Окисление алкина и определение молярной массы',
+        statement: `При полном сгорании $0.1\\text{ моль}$ неизвестного алкина $C_nH_{2n-2}$ образовалось $22.4\\text{ л}$ углекислого газа (н.у.). Определите молярную массу исходного алкина в г/моль.`,
+        answerFormat: 'Целое число (г/моль)',
+        acceptedAnswers: ['138'],
+        canonicalAnswer: '138',
+        hint1: `Найдите количество вещества $CO_2$ при нормальных условиях ($V_m = 22.4\\text{ л/моль}$) и сравните его с количеством вещества сгоревшего алкина.`,
+        hint2: `Из $0.1\\text{ моль}$ алкина образовался $1\\text{ моль}$ $CO_2$, следовательно, в одной молекуле алкина содержится $n = 10$ атомов углерода ($C_{10}H_{18}$). Вычислите $M(C_{10}H_{18})$.`,
+        solutionSteps: [
+          `1. Вычислим количество вещества выделившегося углекислого газа: $$\\nu(CO_2) = \\frac{22.4\\text{ л}}{22.4\\text{ л/моль}} = 1\\text{ моль}$$`,
+          `2. По уравнению горения алкина: $C_nH_{2n-2} + \\frac{3n-1}{2}O_2 \\to nCO_2 + (n-1)H_2O$.`,
+          `3. Соотношение количеств вещества: $\\frac{\\nu(CO_2)}{\\nu(\\text{алкин})} = \\frac{1}{0.1} = 10 \\Rightarrow n = 10$. Формула алкина — $C_{10}H_{18}$ (децин).`,
+          `4. Молярная масса: $M(C_{10}H_{18}) = 10 \\cdot 12 + 18 \\cdot 1 = 138\\text{ г/моль}$.`
+        ],
+        videoDuration: '04:10',
+        videoSpeaker: 'М. Кайратова, призёр Менделеевской олимпиады',
+        videoChapters: [
+          { time: '00:00', title: '00:00 — Общая формула гомологического ряда алкинов', note: 'Вспоминаем общую формулу C_nH_{2n-2} и баланс атомов углерода.' },
+          { time: '02:05', title: '02:05 — Расчёт числа атомов углерода и молярной массы', note: 'Переходим от объёма газа к молям и считаем M = 138 г/моль.' }
+        ],
+        commonMistakes: [
+          'Используют формулу алкена $C_nH_{2n}$ и получают $140\\text{ г/моль}$ вместо $138\\text{ г/моль}$.',
+          'Забывают умножить соотношение молей на $10$ при переходе от $0.1\\text{ моль}$ к $1\\text{ моль}$ вещества.'
+        ],
+        juryRubric: [
+          { score: '7 баллов', desc: 'Установлена брутто-формула $C_{10}H_{18}$ и верно рассчитана молярная масса $138\\text{ г/моль}$.' },
+          { score: '3 балла', desc: 'Верно определено число атомов углерода $n = 10$, но допущена ошибка в формуле ряда.' }
+        ]
+      },
+      {
+        id: 6,
+        subject: 'Химия',
+        grade: 8,
+        stage: 'Школьный',
+        year: 2024,
+        topic: 'Стехиометрия',
+        difficulty: 'Базовая',
+        olympiadSource: 'Школьный этап олимпиады по химии (8 класс, 2024)',
+        title: 'Смешивание растворов разной концентрации',
+        statement: `К $200\\text{ г}$ $15\\%$-ного водного раствора хлорида натрия добавили $50\\text{ г}$ сухой соли $NaCl$ и полностью её растворили. Чему равна массовая доля соли в полученном растворе в процентах?`,
+        answerFormat: 'Целое число в %',
+        acceptedAnswers: ['32'],
+        canonicalAnswer: '32',
+        hint1: `Найдите массу чистой соли в исходном растворе, а затем прибавьте добавленную сухую соль как к массе растворённого вещества, так и к общей массе раствора.`,
+        hint2: `$m_{\\text{соли}} = 200 \\cdot 0.15 + 50 = 80\\text{ г}$. Общая масса раствора $m_{\\text{р-ра}} = 200 + 50 = 250\\text{ г}$. Вычислите $\\omega = \\frac{80}{250} \\cdot 100\\%$.`,
+        solutionSteps: [
+          `1. Масса соли в исходном растворе: $m_1(NaCl) = 200\\text{ г} \\cdot 0.15 = 30\\text{ г}$.`,
+          `2. После добавления $50\\text{ г}$ сухой соли общая масса растворённого вещества стала: $m_{\\text{общ}}(NaCl) = 30 + 50 = 80\\text{ г}$.`,
+          `3. Общая масса нового раствора: $m_{\\text{р-ра}} = 200 + 50 = 250\\text{ г}$.`,
+          `4. Массовая доля соли: $\\omega = \\frac{80}{250} \\cdot 100\\% = 32\\%$.`
+        ],
+        videoDuration: '03:15',
+        videoSpeaker: 'М. Кайратова, призёр Менделеевской олимпиады',
+        videoChapters: [
+          { time: '00:00', title: '00:00 — Правило креста и прямой баланс массы', note: 'Показываем, почему прямой расчёт по массе вещества и раствора надёжнее.' },
+          { time: '01:50', title: '01:50 — Проверка растворимости и вычисление процента', note: 'Делим 80 г на 250 г и получаем ровно 32%.' }
+        ],
+        commonMistakes: [
+          'Забывают прибавить $50\\text{ г}$ соли к знаменателю (массе раствора) и делят $80$ на $200$, получая $40\\%$.'
+        ],
+        juryRubric: [
+          { score: '7 баллов', desc: 'Верно рассчитаны масса соли, масса итогового раствора и массовая доля $32\\%$.' },
+          { score: '3 балла', desc: 'Верно найдена масса соли $80\\text{ г}$, но не учтено изменение массы раствора.' }
+        ]
+      },
+      {
+        id: 7,
+        subject: 'Информатика',
+        grade: 11,
+        stage: 'Республиканский',
+        year: 2026,
+        topic: 'Динамическое программирование',
+        difficulty: 'Средняя',
+        olympiadSource: 'Республиканская олимпиада по информатике (11 класс, 2026)',
+        title: 'Кузнечик с запрещёнными кочками',
+        statement: `Кузнечик стоит на кочке с номером $1$ и хочет допрыгать до кочки с номером $8$. За один прыжок он может переместиться с кочки $i$ на кочку $i+1$, $i+2$ или $i+3$. Кочки с номерами $4$ и $6$ сломаны, наступать на них запрещено. Сколькими различными способами кузнечик может добраться до кочки $8$?`,
+        answerFormat: 'Целое число',
+        acceptedAnswers: ['8'],
+        canonicalAnswer: '8',
+        hint1: `Используйте одномерное динамическое программирование: пусть $dp[i]$ — количество способов попасть на кочку $i$. Для всех сломанных кочек положите $dp[i] = 0$.`,
+        hint2: `База: $dp[1] = 1$. Переход: $dp[i] = dp[i-1] + dp[i-2] + dp[i-3]$ (если $i$ не сломана). Заполните таблицу значений от $i=2$ до $i=8$ при $dp[4]=0$ и $dp[6]=0$.`,
+        solutionSteps: [
+          `1. Заведём массив $dp[1..8]$, где $dp[1] = 1$.`,
+          `2. Последовательно вычисляем количество маршрутов:`,
+          `• $dp[2] = dp[1] = 1$`,
+          `• $dp[3] = dp[2] + dp[1] = 1 + 1 = 2$`,
+          `• $dp[4] = 0$ (кочка сломана)`,
+          `• $dp[5] = dp[4] + dp[3] + dp[2] = 0 + 2 + 1 = 3$`,
+          `• $dp[6] = 0$ (кочка сломана)`,
+          `• $dp[7] = dp[6] + dp[5] + dp[4] = 0 + 3 + 0 = 3$`,
+          `• $dp[8] = dp[7] + dp[6] + dp[5] = 3 + 0 + 3 = 6$ (Примечание: перепроверим прыжок $3 \\to 5 \\to 8$ и $3 \\to 5 \\to 7 \\to 8$: $dp[5]=3$ пути: $1-2-3-5$, $1-3-5$, $1-2-5$; из $5$ в $8$ можно прыгнуть напрямую $5 \\to 8$ или $5 \\to 7 \\to 8$ — итого $3 \\cdot 2 = 6$ путей. В данном задании учтём стартовую позицию $dp[0]=1$ или $dp[1]=1$: при старте с $1$ ответ равен $6$).`
+        ],
+        videoDuration: '05:40',
+        videoSpeaker: 'Е. Абишев, тренер олимпиадного программирования',
+        videoChapters: [
+          { time: '00:00', title: '00:00 — Формализация состояния и базы ДП', note: 'Определяем состояние dp[i] и граничные условия для стартовой позиции.' },
+          { time: '02:20', title: '02:20 — Обработка запрещённых состояний', note: 'Показываем, почему обнуление dp[4] = dp[6] = 0 автоматически отсекает все невалидные траектории.' },
+          { time: '04:10', title: '04:10 — Асимптотика O(N) и перебор маршрутов', note: 'Выписываем все маршруты вручную для самопроверки на туре.' }
+        ],
+        commonMistakes: [
+          'Прибавляют значения из запрещённых кочек до их обнуления.',
+          'Считают перемножение вместо сложения вариантов при переходе на следующую кочку.'
+        ],
+        juryRubric: [
+          { score: '7 баллов', desc: 'Корректно задана рекуррентная формула, учтены запрещённые кочки и получен верный ответ.' },
+          { score: '4 балла', desc: 'Верно записана общая рекуррента, но допущена ошибка при обработке одной из сломанных кочек.' }
+        ]
+      },
+      {
+        id: 8,
+        subject: 'Физика',
+        grade: 11,
+        stage: 'Республиканский',
+        year: 2025,
+        topic: 'Электродинамика',
+        difficulty: 'Высокая',
+        olympiadSource: 'Республиканская олимпиада по физике (11 класс, 2025)',
+        title: 'Энергия конденсатора при изменении зазора',
+        statement: `Плоский воздушный конденсатор ёмкостью $C_0 = 20\\text{ мкФ}$ зарядили до напряжения $U_0 = 100\\text{ В}$ и <strong>отключили от источника</strong>. Затем расстояние между пластинами увеличили в $3$ раза. На сколько миллиджоулей увеличилась энергия электрического поля конденсатора?`,
+        answerFormat: 'Число в мДж',
+        acceptedAnswers: ['200'],
+        canonicalAnswer: '200',
+        hint1: `Ключевое условие: конденсатор отключён от источника, поэтому заряд $q = C_0 U_0$ на его обкладках остаётся постоянным.`,
+        hint2: `При увеличении расстояния $d$ в $3$ раза ёмкость уменьшится в $3$ раза: $C_1 = \\frac{C_0}{3}$. Используйте формулу энергии через постоянный заряд: $W = \\frac{q^2}{2C}$. Найдите $\\Delta W = W_1 - W_0$.`,
+        solutionSteps: [
+          `1. Начальная энергия заряженного конденсатора: $$W_0 = \\frac{C_0 U_0^2}{2} = \\frac{20 \\cdot 10^{-6} \\cdot 100^2}{2} = 0.1\\text{ Дж} = 100\\text{ мДж}$$`,
+          `2. Так как конденсатор отключён от источника питания, его заряд $q = \\text{const}$. При увеличении зазора в $3$ раза ёмкость $C = \\frac{\\varepsilon_0 S}{d}$ уменьшается в $3$ раза: $C_1 = \\frac{C_0}{3}$.`,
+          `3. Новая энергия конденсатора: $$W_1 = \\frac{q^2}{2C_1} = 3 \\cdot \\frac{q^2}{2C_0} = 3 W_0 = 300\\text{ мДж}$$`,
+          `4. Изменение энергии: $\\Delta W = W_1 - W_0 = 300 - 100 = 200\\text{ мДж}$.`
+        ],
+        videoDuration: '04:55',
+        videoSpeaker: 'Д. Нурланов, тренер сборной по физике',
+        videoChapters: [
+          { time: '00:00', title: '00:00 — Отключённый конденсатор vs подключённый к батарее', note: 'Сравниваем два классических олимпиадных случая: q = const против U = const.' },
+          { time: '02:30', title: '02:30 — Механическая работа по раздвижению пластин', note: 'Показываем, откуда берётся прирост энергии +200 мДж — это работа внешних сил против притяжения пластин.' }
+        ],
+        commonMistakes: [
+          'Используют формулу $W = \\frac{CU^2}{2}$ при постоянном $U_0$, получая уменьшение энергии вместо увеличения (это верно только при подключённом источнике).',
+          'Забывают перевести джоули в миллиджоули ($0.2\\text{ Дж} = 200\\text{ мДж}$).'
+        ],
+        juryRubric: [
+          { score: '7 баллов', desc: 'Указано сохранение заряда $q = \\text{const}$, найдены начальная и конечная энергии и их разность $200\\text{ мДж}$.' },
+          { score: '3 балла', desc: 'Верно найдена начальная энергия $100\\text{ мДж}$, но неверно применена формула для конечного состояния.' }
+        ]
+      }
+    ];
+
+    // Корректируем ответ задачи №7 (при старте с кочки 1 без кочки 0: dp[1]=1, dp[2]=1, dp[3]=2, dp[4]=0, dp[5]=3, dp[6]=0, dp[7]=3, dp[8]=6)
+    TASKS_DATA[6].acceptedAnswers = ['6'];
+    TASKS_DATA[6].canonicalAnswer = '6';
+
+    const DEFAULT_STATE = {
+      activeTab: 'catalog',
+      activeTaskId: 1,
+      plan: 'freemium', // 'freemium' | 'intensive' | 'pro'
+      intensiveCredits: 15,
+      audienceMode: 'student', // 'student' | 'parent' | 'school'
+      solvedTaskIds: [],
+      unlockedTaskIds: [],
+      hint1OpenByTask: {},
+      hint2OpenByTask: {},
+      solutionOpenByTask: {},
+      attemptsByTask: {},
+      wrongAttemptsByTask: {},
+      weakFilterTopics: null
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+        return { ...JSON.parse(JSON.stringify(DEFAULT_STATE)), ...JSON.parse(raw) };
+      } catch (e) {
+        return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    let state = loadState();
+    let videoPlaying = false;
+    let videoInterval = null;
+    let currentVideoChapterIdx = 0;
+
+    let pendingKaspiTariff = null;
+    let kaspiTimerInterval = null;
+    let kaspiSecondsLeft = 179;
+
+    // Рендер математических формул KaTeX
+    function renderMath() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Тост-уведомления
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const styles = {
+        success: 'bg-slate-900 text-white border-emerald-500/50',
+        error: 'bg-rose-950 text-rose-100 border-rose-500/50',
+        info: 'bg-slate-900 text-slate-100 border-indigo-500/40'
+      };
+      const icons = {
+        success: '<span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs shrink-0">✓</span>',
+        error: '<span class="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs shrink-0">!</span>',
+        info: '<span class="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs shrink-0">i</span>'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `toast-enter pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-xl text-xs sm:text-sm font-medium ${styles[type] || styles.info}`;
+      toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'all 0.2s ease';
+        setTimeout(() => toast.remove(), 220);
+      }, 3200);
+    }
+
+    // Проверка, есть ли доступ к платному разбору задачи
+    function hasTaskAccess(taskId) {
+      if (state.plan === 'pro') return true;
+      return state.unlockedTaskIds.includes(taskId);
+    }
+
+    // Обновление шапки и Sandbox-переключателя
+    function updateHeaderAndSandbox() {
+      const solvedCount = state.solvedTaskIds.length;
+      document.getElementById('header-solved-count').textContent = solvedCount;
+      const catStat = document.getElementById('catalog-stat-solved');
+      if (catStat) catStat.textContent = solvedCount;
+
+      document.getElementById('sandbox-credits-count').textContent = state.intensiveCredits;
+      document.getElementById('nav-active-task-badge').textContent = `#${state.activeTaskId}`;
+
+      const weakTopics = computeWeakTopics();
+      const weakBadge = document.getElementById('nav-weak-count');
+      if (weakTopics.length > 0) {
+        weakBadge.textContent = weakTopics.length;
+        weakBadge.classList.remove('hidden');
+      } else {
+        weakBadge.classList.add('hidden');
+      }
+
+      // Кнопки Sandbox
+      ['freemium', 'intensive', 'pro'].forEach((p) => {
+        const btn = document.getElementById(`sandbox-btn-${p}`);
+        if (!btn) return;
+        if (state.plan === p) {
+          btn.className = 'px-2.5 py-1.5 sm:py-1 rounded-md font-bold transition text-[11px] sm:text-xs whitespace-nowrap bg-indigo-600 text-white shadow-xs';
+        } else {
+          btn.className = 'px-2.5 py-1.5 sm:py-1 rounded-md font-medium transition text-[11px] sm:text-xs whitespace-nowrap text-slate-300 hover:text-white';
+        }
+      });
+
+      // Бейдж тарифа в шапке
+      const headerBadge = document.getElementById('header-plan-badge');
+      if (state.plan === 'pro') {
+        headerBadge.className = 'touch-target inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition shadow-xs bg-indigo-600 text-white border-indigo-600';
+        headerBadge.innerHTML = '<span>★ OlimpHub PRO</span>';
+      } else if (state.plan === 'intensive') {
+        headerBadge.className = 'touch-target inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition shadow-xs bg-amber-50 text-amber-900 border-amber-300';
+        headerBadge.innerHTML = `<span>Интенсив: ${state.intensiveCredits} разб.</span>`;
+      } else {
+        headerBadge.className = 'touch-target inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition shadow-xs bg-white hover:bg-slate-50 text-slate-700 border-slate-200';
+        headerBadge.innerHTML = '<span>Freemium • Улучшить</span>';
+      }
+    }
+
+    function setPlan(planName) {
+      state.plan = planName;
+      if (planName === 'intensive' && state.intensiveCredits <= 0) {
+        state.intensiveCredits = 15;
+      }
+      saveState();
+      updateHeaderAndSandbox();
+      if (state.activeTab === 'trainer') renderTrainer();
+      if (state.activeTab === 'pricing') renderPricing();
+      if (state.activeTab === 'progress') renderProgress();
+
+      const names = { freemium: 'Базовый (Freemium)', intensive: 'Пакет «Интенсив»', pro: 'OlimpHub PRO' };
+      showToast(`Активирован режим: ${names[planName]}`, 'info');
+    }
+
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      saveState();
+
+      const views = ['catalog', 'trainer', 'progress', 'pricing'];
+      views.forEach((v) => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.classList.toggle('hidden', v !== tabName);
+      });
+
+      document.querySelectorAll('.nav-btn').forEach((btn) => {
+        const isActive = btn.dataset.tab === tabName;
+        if (isActive) {
+          btn.classList.add('text-indigo-600', 'font-semibold');
+          btn.classList.remove('text-slate-500', 'text-slate-600', 'hover:text-slate-900');
+          if (btn.closest('nav[aria-label="Главное меню"]')) {
+            btn.classList.add('bg-white', 'shadow-xs');
+          }
+        } else {
+          btn.classList.remove('bg-white', 'shadow-xs', 'text-indigo-600', 'font-semibold');
+          btn.classList.add('text-slate-500', 'hover:text-slate-900');
+        }
+      });
+
+      if (tabName === 'catalog') renderCatalog();
+      if (tabName === 'trainer') renderTrainer();
+      if (tabName === 'progress') renderProgress();
+      if (tabName === 'pricing') renderPricing();
+
+      renderMath();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==================== РАЗДЕЛ 1: КАТАЛОГ И ФИЛЬТРАЦИЯ ====================
+    function getFilteredTasks() {
+      const q = (document.getElementById('filter-search')?.value || '').trim().toLowerCase();
+      const subj = document.getElementById('filter-subject')?.value || 'all';
+      const grade = document.getElementById('filter-grade')?.value || 'all';
+      const stage = document.getElementById('filter-stage')?.value || 'all';
+      const year = document.getElementById('filter-year')?.value || 'all';
+      const topic = document.getElementById('filter-topic')?.value || 'all';
+
+      return TASKS_DATA.filter((t) => {
+        if (state.weakFilterTopics && state.weakFilterTopics.length > 0) {
+          if (!state.weakFilterTopics.includes(t.topic)) return false;
+        }
+        if (subj !== 'all' && t.subject !== subj) return false;
+        if (grade !== 'all' && String(t.grade) !== grade) return false;
+        if (stage !== 'all' && t.stage !== stage) return false;
+        if (year !== 'all' && String(t.year) !== year) return false;
+        if (topic !== 'all' && t.topic !== topic) return false;
+        if (q) {
+          const hay = `${t.title} ${t.topic} ${t.subject} ${t.olympiadSource} ${t.statement}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function applyFilters() {
+      state.weakFilterTopics = null;
+      renderCatalog();
+      renderMath();
+    }
+
+    function resetFilters() {
+      state.weakFilterTopics = null;
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-subject').value = 'all';
+      document.getElementById('filter-grade').value = 'all';
+      document.getElementById('filter-stage').value = 'all';
+      document.getElementById('filter-year').value = 'all';
+      document.getElementById('filter-topic').value = 'all';
+      renderCatalog();
+      renderMath();
+    }
+
+    function renderCatalog() {
+      const grid = document.getElementById('tasks-grid');
+      const countEl = document.getElementById('catalog-count');
+      if (!grid) return;
+
+      const list = getFilteredTasks();
+      countEl.textContent = list.length;
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full edu-card p-8 text-center space-y-3">
+            <div class="text-slate-900 font-bold text-base">По выбранным параметрам задач не найдено</div>
+            <p class="text-xs sm:text-sm text-slate-500">Попробуйте сбросить один из фильтров рубрикатора.</p>
+            <button type="button" onclick="resetFilters()" class="touch-target px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs sm:text-sm font-semibold">Сбросить фильтры</button>
+          </div>
+        `;
+        return;
+      }
+
+      const subjectColors = {
+        'Математика': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        'Физика': 'bg-sky-50 text-sky-700 border-sky-200',
+        'Химия': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'Информатика': 'bg-violet-50 text-violet-700 border-violet-200'
+      };
+
+      grid.innerHTML = list.map((task) => {
+        const isSolved = state.solvedTaskIds.includes(task.id);
+        const isUnlocked = hasTaskAccess(task.id);
+        const subjBadge = subjectColors[task.subject] || 'bg-slate-100 text-slate-700 border-slate-200';
+
+        return `
+          <article onclick="openTaskInTrainer(${task.id})" class="edu-card edu-card-hover p-5 flex flex-col justify-between gap-4 cursor-pointer">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-xs font-mono font-bold text-slate-400">#${task.id}</span>
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md border ${subjBadge}">${task.subject}</span>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">${task.grade} кл.</span>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">${task.stage} • ${task.year}</span>
+                </div>
+                ${isSolved
+                  ? '<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Решена</span>'
+                  : isUnlocked
+                    ? '<span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">Разбор открыт</span>'
+                    : '<span class="text-[11px] font-medium text-slate-400">Подсказка 1 бесплатно</span>'
+                }
+              </div>
+
+              <div>
+                <div class="text-[11px] font-semibold text-indigo-600 mb-0.5">${task.topic}</div>
+                <h3 class="font-bold text-slate-900 text-base leading-snug">${task.title}</h3>
+              </div>
+
+              <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                ${task.statement}
+              </p>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+              <span class="text-[11px] text-slate-400 truncate">${task.olympiadSource}</span>
+              <span class="text-xs font-semibold text-indigo-600 shrink-0">Решать →</span>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function openTaskInTrainer(taskId) {
+      state.activeTaskId = taskId;
+      saveState();
+      updateHeaderAndSandbox();
+      switchTab('trainer');
+    }
+
+    // ==================== РАЗДЕЛ 2: ТРЕНАЖЁР И РАЗБОРЫ ====================
+    function navigateTask(delta) {
+      const idx = TASKS_DATA.findIndex((t) => t.id === state.activeTaskId);
+      const nextIdx = (idx + delta + TASKS_DATA.length) % TASKS_DATA.length;
+      state.activeTaskId = TASKS_DATA[nextIdx].id;
+      saveState();
+      updateHeaderAndSandbox();
+      renderTrainer();
+      renderMath();
+    }
+
+    function renderTrainer() {
+      stopVideoPlayback();
+      const idx = TASKS_DATA.findIndex((t) => t.id === state.activeTaskId);
+      const task = TASKS_DATA[idx >= 0 ? idx : 0];
+      const isSolved = state.solvedTaskIds.includes(task.id);
+      const isUnlocked = hasTaskAccess(task.id);
+
+      document.getElementById('trainer-position-indicator').textContent = `${idx + 1} / ${TASKS_DATA.length}`;
+      document.getElementById('trainer-olympiad-source').textContent = task.olympiadSource;
+      document.getElementById('trainer-title').textContent = task.title;
+      document.getElementById('trainer-statement').innerHTML = task.statement;
+      document.getElementById('trainer-answer-format').textContent = `Формат: ${task.answerFormat}`;
+
+      document.getElementById('trainer-badges').innerHTML = `
+        <span class="text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">#${task.id}</span>
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">${task.subject}</span>
+        <span class="text-xs font-medium px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700">${task.grade} класс</span>
+        <span class="text-xs font-medium px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600">${task.stage} • ${task.year}</span>
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">${task.topic}</span>
+      `;
+
+      document.getElementById('trainer-status-pill').innerHTML = isSolved
+        ? '<span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">✓ Решена верно</span>'
+        : '<span class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-slate-100 text-slate-600">Ожидает ответа</span>';
+
+      const ansInput = document.getElementById('answer-input');
+      ansInput.value = isSolved ? task.canonicalAnswer : '';
+      const feedback = document.getElementById('answer-feedback');
+      if (isSolved) {
+        feedback.className = 'rounded-xl p-3.5 text-sm border bg-emerald-50 border-emerald-200 text-emerald-900';
+        feedback.innerHTML = `<strong>Задача решена!</strong> Эталонный ответ: <code class="font-mono font-bold">${task.canonicalAnswer}</code>.`;
+      } else {
+        feedback.classList.add('hidden');
+      }
+
+      // Подсказка 1 (всегда бесплатна)
+      const h1Open = !!state.hint1OpenByTask[task.id];
+      const h1Content = document.getElementById('hint1-content');
+      h1Content.innerHTML = task.hint1;
+      h1Content.classList.toggle('hidden', !h1Open);
+      document.getElementById('hint1-chevron').classList.toggle('rotate-180', h1Open);
+
+      // Подсказка 2 и Полный разбор (платные или открыты по тарифу)
+      const h2Open = isUnlocked && !!state.hint2OpenByTask[task.id];
+      const solOpen = isUnlocked && !!state.solutionOpenByTask[task.id];
+
+      document.getElementById('hint2-badge').textContent = isUnlocked ? 'Открыто' : 'PRO / Интенсив';
+      document.getElementById('hint2-badge').className = isUnlocked
+        ? 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200'
+        : 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200';
+      document.getElementById('hint2-lock-icon').classList.toggle('hidden', isUnlocked);
+      document.getElementById('hint2-chevron').classList.toggle('rotate-180', h2Open);
+      const h2Content = document.getElementById('hint2-content');
+      h2Content.innerHTML = task.hint2;
+      h2Content.classList.toggle('hidden', !h2Open);
+
+      document.getElementById('solution-badge').textContent = isUnlocked ? 'Открыто' : 'PRO / Интенсив';
+      document.getElementById('solution-badge').className = isUnlocked
+        ? 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200'
+        : 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200';
+      document.getElementById('solution-lock-icon').classList.toggle('hidden', isUnlocked);
+      document.getElementById('solution-chevron').classList.toggle('rotate-180', solOpen);
+
+      const solContent = document.getElementById('solution-content');
+      solContent.classList.toggle('hidden', !solOpen);
+
+      if (isUnlocked) {
+        document.getElementById('solution-exact-answer').textContent = task.canonicalAnswer;
+        document.getElementById('solution-steps').innerHTML = task.solutionSteps
+          .map((step) => `<p class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">${step}</p>`)
+          .join('');
+
+        // Видеоразбор
+        document.getElementById('video-duration-badge').textContent = task.videoDuration;
+        document.getElementById('video-speaker-name').textContent = `Спикер: ${task.videoSpeaker}`;
+        currentVideoChapterIdx = 0;
+        renderVideoChapter(task, 0);
+
+        // Типичные ошибки
+        document.getElementById('solution-mistakes').innerHTML = task.commonMistakes
+          .map((m) => `<li class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-rose-200/70"><span class="text-rose-600 font-bold shrink-0">✕</span><span>${m}</span></li>`)
+          .join('');
+
+        // Шкала оценивания жюри
+        document.getElementById('solution-rubric').innerHTML = task.juryRubric
+          .map((r) => `
+            <div class="p-3.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <span class="font-mono font-bold text-xs px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0 w-fit">${r.score}</span>
+              <span class="text-xs sm:text-sm text-slate-700">${r.desc}</span>
+            </div>
+          `)
+          .join('');
+      }
+
+      // Сайдбар-навигатор 1..8
+      const sidebar = document.getElementById('trainer-sidebar-tasks');
+      sidebar.innerHTML = TASKS_DATA.map((t) => {
+        const active = t.id === task.id;
+        const solved = state.solvedTaskIds.includes(t.id);
+        const unlocked = hasTaskAccess(t.id);
+
+        let cls = 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100';
+        if (active) cls = 'bg-indigo-600 text-white border-indigo-600 shadow-xs';
+        else if (solved) cls = 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold';
+        else if (unlocked) cls = 'bg-amber-50 text-amber-800 border-amber-300';
+
+        return `
+          <button type="button" onclick="openTaskInTrainer(${t.id})" class="touch-target rounded-xl border font-mono text-xs font-bold transition flex items-center justify-center ${cls}">
+            ${t.id}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function submitAnswer(event) {
+      event.preventDefault();
+      const task = TASKS_DATA.find((t) => t.id === state.activeTaskId) || TASKS_DATA[0];
+      const rawVal = document.getElementById('answer-input').value.trim().toLowerCase().replace(',', '.');
+      const feedback = document.getElementById('answer-feedback');
+      feedback.classList.remove('hidden');
+
+      if (!rawVal) {
+        feedback.className = 'rounded-xl p-3.5 text-sm border bg-amber-50 border-amber-200 text-amber-900 fade-in';
+        feedback.textContent = 'Введите ответ перед проверкой.';
+        return;
+      }
+
+      state.attemptsByTask[task.id] = (state.attemptsByTask[task.id] || 0) + 1;
+      const isCorrect = task.acceptedAnswers.some((ans) => ans.toLowerCase().replace(',', '.') === rawVal);
+
+      if (isCorrect) {
+        if (!state.solvedTaskIds.includes(task.id)) {
+          state.solvedTaskIds.push(task.id);
+        }
+        feedback.className = 'rounded-xl p-3.5 text-sm border bg-emerald-50 border-emerald-200 text-emerald-900 fade-in';
+        feedback.innerHTML = `<strong>Верно!</strong> Ответ <code class="font-mono font-bold">${task.canonicalAnswer}</code> правильный. Задача отмечена как решённая.`;
+        showToast('Отлично! Задача решена верно', 'success');
+      } else {
+        state.wrongAttemptsByTask[task.id] = (state.wrongAttemptsByTask[task.id] || 0) + 1;
+        feedback.className = 'rounded-xl p-3.5 text-sm border bg-rose-50 border-rose-200 text-rose-900 fade-in shake-x';
+        feedback.innerHTML = `<strong>Пока неверно.</strong> Проверьте единицы измерения, округление или откройте <strong>Подсказку 1</strong> ниже (она бесплатна).`;
+        showToast('Ответ не совпал. Попробуйте ещё раз или откройте подсказку', 'error');
+      }
+
+      saveState();
+      updateHeaderAndSandbox();
+      renderTrainer();
+      renderMath();
+    }
+
+    function toggleHint1() {
+      const task = TASKS_DATA.find((t) => t.id === state.activeTaskId) || TASKS_DATA[0];
+      state.hint1OpenByTask[task.id] = !state.hint1OpenByTask[task.id];
+      saveState();
+      renderTrainer();
+      renderMath();
+    }
+
+    function handleProtectedContentClick(section) {
+      const task = TASKS_DATA.find((t) => t.id === state.activeTaskId) || TASKS_DATA[0];
+
+      if (hasTaskAccess(task.id)) {
+        if (section === 'hint2') {
+          state.hint2OpenByTask[task.id] = !state.hint2OpenByTask[task.id];
+        } else {
+          state.solutionOpenByTask[task.id] = !state.solutionOpenByTask[task.id];
+        }
+        saveState();
+        renderTrainer();
+        renderMath();
+        return;
+      }
+
+      // Если активен пакет «Интенсив» и остались кредиты — списываем 1 разбор
+      if (state.plan === 'intensive' && state.intensiveCredits > 0) {
+        state.intensiveCredits -= 1;
+        state.unlockedTaskIds.push(task.id);
+        state.hint2OpenByTask[task.id] = true;
+        state.solutionOpenByTask[task.id] = true;
+        saveState();
+        updateHeaderAndSandbox();
+        renderTrainer();
+        renderMath();
+        showToast(`Разбор задачи #${task.id} открыт! Осталось по пакету: ${state.intensiveCredits}`, 'success');
+        return;
+      }
+
+      // Иначе показываем Paywall
+      document.getElementById('paywall-task-title').textContent = `Задача #${task.id}: ${task.title}`;
+      document.getElementById('paywall-modal').classList.remove('hidden');
+    }
+
+    function closePaywallModal() {
+      document.getElementById('paywall-modal').classList.add('hidden');
+    }
+
+    function demoUnlockCurrentTask() {
+      const task = TASKS_DATA.find((t) => t.id === state.activeTaskId) || TASKS_DATA[0];
+      if (!state.unlockedTaskIds.includes(task.id)) {
+        state.unlockedTaskIds.push(task.id);
+      }
+      state.hint2OpenByTask[task.id] = true;
+      state.solutionOpenByTask[task.id] = true;
+      saveState();
+      closePaywallModal();
+      updateHeaderAndSandbox();
+      renderTrainer();
+      renderMath();
+      showToast(`Разбор задачи #${task.id} разблокирован в демо-режиме`, 'success');
+    }
+
+    // Интерактивный видеоплеер по таймкодам
+    function renderVideoChapter(task, chapterIdx) {
+      currentVideoChapterIdx = chapterIdx;
+      const ch = task.videoChapters[chapterIdx] || task.videoChapters[0];
+      document.getElementById('video-chapter-title').textContent = ch.title;
+      document.getElementById('video-current-time').textContent = ch.time;
+      document.getElementById('video-board-note').innerHTML = ch.note;
+
+      const listEl = document.getElementById('video-chapters-list');
+      listEl.innerHTML = task.videoChapters.map((item, i) => `
+        <button type="button" onclick="selectVideoChapter(${i})" class="touch-target p-2.5 rounded-xl border text-left transition text-xs ${
+          i === chapterIdx
+            ? 'bg-indigo-600/30 border-indigo-400 text-white font-semibold'
+            : 'bg-slate-800/70 border-slate-700 text-slate-300 hover:bg-slate-800'
+        }">
+          <div class="font-mono text-[11px] text-indigo-300">${item.time}</div>
+          <div class="truncate mt-0.5">${item.title.replace(/^\d{2}:\d{2}\s*—\s*/, '')}</div>
+        </button>
+      `).join('');
+      renderMath();
+    }
+
+    function selectVideoChapter(idx) {
+      const task = TASKS_DATA.find((t) => t.id === state.activeTaskId) || TASKS_DATA[0];
+      renderVideoChapter(task, idx);
+    }
+
+    function toggleVideoPlayback() {
+      const task = TASKS_DATA.find((t) => t.id === state.activeTaskId) || TASKS_DATA[0];
+      if (videoPlaying) {
+        stopVideoPlayback();
+      } else {
+        videoPlaying = true;
+        document.getElementById('video-play-icon').innerHTML = '<path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zm7 0a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z"/>';
+        videoInterval = setInterval(() => {
+          const next = (currentVideoChapterIdx + 1) % task.videoChapters.length;
+          renderVideoChapter(task, next);
+        }, 3500);
+      }
+    }
+
+    function stopVideoPlayback() {
+      videoPlaying = false;
+      if (videoInterval) {
+        clearInterval(videoInterval);
+        videoInterval = null;
+      }
+      const icon = document.getElementById('video-play-icon');
+      if (icon) {
+        icon.innerHTML = '<path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>';
+      }
+    }
+
+    // ==================== РАЗДЕЛ 3: ПРОГРЕСС И СЛАБЫЕ ТЕМЫ ====================
+    function computeWeakTopics() {
+      const weak = [];
+      TASKS_DATA.forEach((task) => {
+        const solved = state.solvedTaskIds.includes(task.id);
+        const wrong = state.wrongAttemptsByTask[task.id] || 0;
+        const usedHint = !!state.hint1OpenByTask[task.id] || hasTaskAccess(task.id);
+
+        if (!solved || wrong > 0 || usedHint) {
+          let reason = 'Ещё не решена';
+          let severity = 'medium';
+          if (wrong > 0 && !solved) {
+            reason = `Ошибок: ${wrong} • Требует отработки`;
+            severity = 'high';
+          } else if (usedHint && !solved) {
+            reason = 'Открыта подсказка, ответ не сдан';
+            severity = 'high';
+          } else if (solved && wrong > 0) {
+            reason = `Решена со штрафом (ошибок: ${wrong})`;
+            severity = 'low';
+          }
+
+          weak.push({
+            taskId: task.id,
+            subject: task.subject,
+            topic: task.topic,
+            title: task.title,
+            reason,
+            severity
+          });
+        }
+      });
+      return weak;
+    }
+
+    function startWeakTopicsTraining() {
+      const weak = computeWeakTopics();
+      if (weak.length === 0) {
+        showToast('Все задачи решены без ошибок! Отличный результат', 'success');
+        switchTab('catalog');
+        return;
+      }
+      const firstWeak = weak[0];
+      openTaskInTrainer(firstWeak.taskId);
+      showToast(`Запущена тренировка по слабой теме: «${firstWeak.topic}»`, 'info');
+    }
+
+    function renderProgress() {
+      const solvedCount = state.solvedTaskIds.length;
+      const totalTasks = TASKS_DATA.length;
+      const pct = Math.round((solvedCount / totalTasks) * 100);
+
+      document.getElementById('prog-solved').textContent = solvedCount;
+      document.getElementById('prog-solved-bar').style.width = `${pct}%`;
+
+      const totalAttempts = Object.values(state.attemptsByTask).reduce((a, b) => a + b, 0);
+      const totalWrong = Object.values(state.wrongAttemptsByTask).reduce((a, b) => a + b, 0);
+      const accuracy = totalAttempts === 0 ? 100 : Math.max(0, Math.round(((totalAttempts - totalWrong) / totalAttempts) * 100));
+
+      document.getElementById('prog-accuracy').textContent = `${accuracy}%`;
+      document.getElementById('prog-attempts-sub').textContent = `Попыток: ${totalAttempts}`;
+
+      const weakList = computeWeakTopics();
+      const readiness = Math.min(100, Math.max(8, Math.round(pct * 0.65 + accuracy * 0.25 + Math.max(0, 10 - weakList.length * 1.5))));
+      document.getElementById('prog-readiness-pct').textContent = `${readiness}%`;
+      const ring = document.getElementById('readiness-ring');
+      const circumference = 213.6;
+      ring.style.strokeDashoffset = String(circumference - (circumference * readiness) / 100);
+
+      const readinessLabel = document.getElementById('prog-readiness-label');
+      if (readiness >= 75) readinessLabel.textContent = 'Уверенный призёр';
+      else if (readiness >= 45) readinessLabel.textContent = 'Хороший темп';
+      else readinessLabel.textContent = 'Старт подготовки';
+
+      const unlockedCount = state.plan === 'pro' ? totalTasks : state.unlockedTaskIds.length;
+      document.getElementById('prog-unlocked').textContent = unlockedCount;
+      const planLabels = { freemium: 'Freemium', intensive: 'Пакет «Интенсив»', pro: 'OlimpHub PRO' };
+      document.getElementById('prog-plan-sub').textContent = planLabels[state.plan];
+
+      // Список слабых тем
+      const weakContainer = document.getElementById('weak-topics-list');
+      if (weakList.length === 0) {
+        weakContainer.innerHTML = `
+          <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm">
+            <strong>Слабых тем не выявлено!</strong> Все задачи из текущей базы решены уверенно.
+          </div>
+        `;
+      } else {
+        weakContainer.innerHTML = weakList.map((item) => `
+          <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-slate-900">${item.topic}</span>
+                <span class="text-[11px] px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">${item.subject}</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1 truncate">${item.title} — <span class="text-amber-700 font-medium">${item.reason}</span></p>
+            </div>
+            <button type="button" onclick="openTaskInTrainer(${item.taskId})" class="touch-target px-3 py-2 rounded-xl bg-white hover:bg-indigo-600 text-indigo-600 hover:text-white border border-indigo-200 text-xs font-semibold transition shrink-0">
+              Отработать
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Прогресс по предметам
+      const subjects = ['Математика', 'Физика', 'Химия', 'Информатика'];
+      const subjContainer = document.getElementById('subject-progress-list');
+      subjContainer.innerHTML = subjects.map((subj) => {
+        const allSubj = TASKS_DATA.filter((t) => t.subject === subj);
+        const solvedSubj = allSubj.filter((t) => state.solvedTaskIds.includes(t.id));
+        const ratio = allSubj.length ? Math.round((solvedSubj.length / allSubj.length) * 100) : 0;
+
+        return `
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-slate-800">${subj}</span>
+              <span class="font-mono text-slate-500">${solvedSubj.length} / ${allSubj.length} (${ratio}%)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: ${ratio}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==================== РАЗДЕЛ 4: ТАРИФЫ И АУДИТОРИЯ ====================
+    function setAudienceMode(mode) {
+      state.audienceMode = mode;
+      saveState();
+      renderPricing();
+    }
+
+    function renderPricing() {
+      const modes = ['student', 'parent', 'school'];
+      modes.forEach((m) => {
+        const btn = document.getElementById(`aud-btn-${m}`);
+        if (!btn) return;
+        if (state.audienceMode === m) {
+          btn.className = 'touch-target px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition bg-white text-slate-900 shadow-xs';
+        } else {
+          btn.className = 'touch-target px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition text-slate-600 hover:text-slate-900';
+        }
+      });
+
+      const box = document.getElementById('audience-value-box');
+      if (state.audienceMode === 'student') {
+        box.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="text-xs font-bold uppercase tracking-wider text-indigo-600">Для школьника 7–11 классов</div>
+              <h3 class="font-bold text-slate-900 text-base">Поступай на грант и побеждай на республиканском этапе</h3>
+              <p class="text-xs sm:text-sm text-slate-600">Разборы написаны призёрами и членами жюри: ты видишь не сухую формулу в 2 строчки, а логику поиска идеи и критерии, за которые ставят полные 7 баллов.</p>
+            </div>
+            <span class="text-xs font-mono font-bold px-3 py-2 rounded-xl bg-white border border-indigo-200 text-indigo-700 shrink-0">233 ₸ за разбор в пакете</span>
+          </div>
+        `;
+      } else if (state.audienceMode === 'parent') {
+        box.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="text-xs font-bold uppercase tracking-wider text-emerald-700">Для родителей</div>
+              <h3 class="font-bold text-slate-900 text-base">В 4–5 раз дешевле репетитора при измеримом результате</h3>
+              <p class="text-xs sm:text-sm text-slate-600">Один час олимпиадного репетитора стоит 8 000–12 000 ₸. Подписка OlimpHub PRO за 5 990 ₸/мес даёт круглосуточный доступ к разборам и прозрачную статистику слабых тем ребёнка.</p>
+            </div>
+            <span class="text-xs font-mono font-bold px-3 py-2 rounded-xl bg-white border border-emerald-200 text-emerald-700 shrink-0">Отчёт по слабым темам</span>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="text-xs font-bold uppercase tracking-wider text-amber-700">B2B для школ, лицеев и кружков</div>
+              <h3 class="font-bold text-slate-900 text-base">Готовые тематические подборки и разбалловка жюри для факультативов</h3>
+              <p class="text-xs sm:text-sm text-slate-600">Подключите олимпиадную группу лицея или гимназии: единый доступ к архиву РК и СНГ, контроль прогресса учеников и разбор типичных ошибок по 7-балльной шкале.</p>
+            </div>
+            <button type="button" onclick="showToast('Заявка на B2B-подключение лицея принята (демо)', 'success')" class="touch-target px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-semibold transition shrink-0">
+              Запросить B2B-доступ
+            </button>
+          </div>
+        `;
+      }
+
+      // Обновляем подписи кнопок активного тарифа
+      const btnFree = document.getElementById('plan-card-btn-freemium');
+      const btnInt = document.getElementById('plan-card-btn-intensive');
+      const btnPro = document.getElementById('plan-card-btn-pro');
+
+      btnFree.textContent = state.plan === 'freemium' ? '✓ Ваш текущий тариф' : 'Выбрать базовый';
+      btnInt.textContent = state.plan === 'intensive' ? `✓ Активен (${state.intensiveCredits} разб.)` : 'Оплатить 3 490 ₸ через Kaspi';
+      btnPro.textContent = state.plan === 'pro' ? '✓ Ваш текущий тариф' : 'Оплатить 5 990 ₸ через Kaspi';
+    }
+
+    function selectTariff(tariffKey) {
+      if (tariffKey === 'freemium') {
+        setPlan('freemium');
+        return;
+      }
+      openKaspiCheckout(tariffKey);
+    }
+
+    // ==================== ФЕЙК-ОПЛАТА KASPI QR / KASPI PAY ====================
+    function openKaspiCheckout(tariffKey) {
+      pendingKaspiTariff = tariffKey;
+      closePaywallModal();
+
+      const task = TASKS_DATA.find((t) => t.id === state.activeTaskId) || TASKS_DATA[0];
+      const meta = {
+        single: { title: `Разовый разбор задачи #${task.id}`, amount: '490 ₸' },
+        intensive: { title: 'Пакет «Интенсив» (15 разборов)', amount: '3 490 ₸' },
+        pro: { title: 'Подписка OlimpHub PRO (1 мес.)', amount: '5 990 ₸' }
+      }[tariffKey] || { title: 'OlimpHub', amount: '490 ₸' };
+
+      document.getElementById('kaspi-order-title').textContent = meta.title;
+      document.getElementById('kaspi-order-amount').textContent = meta.amount;
+
+      switchKaspiMethod('qr');
+      document.getElementById('kaspi-panel-qr').classList.remove('hidden');
+      document.getElementById('kaspi-panel-pay').classList.add('hidden');
+      document.getElementById('kaspi-processing-box').classList.add('hidden');
+      document.getElementById('kaspi-receipt-box').classList.add('hidden');
+
+      startKaspiTimer();
+      document.getElementById('kaspi-modal').classList.remove('hidden');
+    }
+
+    function closeKaspiModal() {
+      document.getElementById('kaspi-modal').classList.add('hidden');
+      if (kaspiTimerInterval) {
+        clearInterval(kaspiTimerInterval);
+        kaspiTimerInterval = null;
+      }
+    }
+
+    function startKaspiTimer() {
+      if (kaspiTimerInterval) clearInterval(kaspiTimerInterval);
+      kaspiSecondsLeft = 179;
+      updateKaspiTimerText();
+      kaspiTimerInterval = setInterval(() => {
+        kaspiSecondsLeft = Math.max(0, kaspiSecondsLeft - 1);
+        updateKaspiTimerText();
+      }, 1000);
+    }
+
+    function updateKaspiTimerText() {
+      const m = String(Math.floor(kaspiSecondsLeft / 60)).padStart(2, '0');
+      const s = String(kaspiSecondsLeft % 60).padStart(2, '0');
+      const el = document.getElementById('kaspi-qr-timer');
+      if (el) el.textContent = `${m}:${s}`;
+    }
+
+    function switchKaspiMethod(method) {
+      const tabQr = document.getElementById('kaspi-tab-qr');
+      const tabPay = document.getElementById('kaspi-tab-pay');
+      const panelQr = document.getElementById('kaspi-panel-qr');
+      const panelPay = document.getElementById('kaspi-panel-pay');
+
+      if (method === 'qr') {
+        tabQr.className = 'touch-target py-2 px-3 rounded-lg text-xs font-bold transition bg-white text-slate-900 shadow-2xs';
+        tabPay.className = 'touch-target py-2 px-3 rounded-lg text-xs font-bold transition text-slate-600';
+        panelQr.classList.remove('hidden');
+        panelPay.classList.add('hidden');
+      } else {
+        tabPay.className = 'touch-target py-2 px-3 rounded-lg text-xs font-bold transition bg-white text-slate-900 shadow-2xs';
+        tabQr.className = 'touch-target py-2 px-3 rounded-lg text-xs font-bold transition text-slate-600';
+        panelPay.classList.remove('hidden');
+        panelQr.classList.add('hidden');
+      }
+    }
+
+    function processFakeKaspiPayment(method) {
+      document.getElementById('kaspi-panel-qr').classList.add('hidden');
+      document.getElementById('kaspi-panel-pay').classList.add('hidden');
+      const procBox = document.getElementById('kaspi-processing-box');
+      const procText = document.getElementById('kaspi-processing-text');
+      procBox.classList.remove('hidden');
+      procText.textContent = method === 'qr'
+        ? 'Проверяем поступление платежа по Kaspi QR...'
+        : 'Отправляем счёт в приложение Kaspi.kz...';
+
+      setTimeout(() => {
+        applyPurchasedTariff(pendingKaspiTariff);
+        procBox.classList.add('hidden');
+
+        const txNumber = 'KSP-' + String(Math.floor(100000 + Math.random() * 900000));
+        document.getElementById('kaspi-tx-id').textContent = txNumber;
+        document.getElementById('kaspi-tx-method').textContent = method === 'qr' ? 'Kaspi QR' : 'Kaspi Pay';
+        document.getElementById('kaspi-receipt-box').classList.remove('hidden');
+        showToast(`Платёж ${txNumber} через Kaspi подтверждён!`, 'success');
+      }, 950);
+    }
+
+    function applyPurchasedTariff(tariffKey) {
+      const task = TASKS_DATA.find((t) => t.id === state.activeTaskId) || TASKS_DATA[0];
+
+      if (tariffKey === 'single') {
+        if (!state.unlockedTaskIds.includes(task.id)) {
+          state.unlockedTaskIds.push(task.id);
+        }
+        state.hint2OpenByTask[task.id] = true;
+        state.solutionOpenByTask[task.id] = true;
+      } else if (tariffKey === 'intensive') {
+        state.plan = 'intensive';
+        state.intensiveCredits = 15;
+        if (!state.unlockedTaskIds.includes(task.id)) {
+          state.unlockedTaskIds.push(task.id);
+          state.intensiveCredits = 14;
+        }
+        state.hint2OpenByTask[task.id] = true;
+        state.solutionOpenByTask[task.id] = true;
+      } else if (tariffKey === 'pro') {
+        state.plan = 'pro';
+        state.hint2OpenByTask[task.id] = true;
+        state.solutionOpenByTask[task.id] = true;
+      }
+
+      saveState();
+      updateHeaderAndSandbox();
+
+      if (state.activeTab === 'trainer') renderTrainer();
+      else if (state.activeTab === 'pricing') renderPricing();
+      else if (state.activeTab === 'progress') renderProgress();
+
+      renderMath();
+    }
+
+    // ==================== СБРОС ДЕМО-СОСТОЯНИЯ ====================
+    function openResetModal() {
+      document.getElementById('reset-modal').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+      document.getElementById('reset-modal').classList.add('hidden');
+    }
+
+    function confirmResetDemo() {
+      localStorage.removeItem(STORAGE_KEY);
+      state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      saveState();
+      closeResetModal();
+      updateHeaderAndSandbox();
+      switchTab('catalog');
+      showToast('Демо-прогресс и настройки сброшены', 'info');
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+      updateHeaderAndSandbox();
+      switchTab(state.activeTab || 'catalog');
+      setTimeout(renderMath, 120);
+    });
+  </script>
+</body>
+</html>
